@@ -174,7 +174,16 @@
   .schem p{font-size:14px;line-height:1.6;color:var(--parchment);opacity:.85}
   /* divider gradientowy - zarzacy sie drut */
   .sdiv{height:1px;margin:1.35rem 0;background:linear-gradient(90deg,transparent 0%,rgba(142,105,69,.25) 18%,var(--amber) 50%,rgba(142,105,69,.25) 82%,transparent 100%);opacity:.65}
-  @media (max-width:760px){ .draft-copy{max-width:100%} .schem p{font-size:13.5px} }
+  @media (max-width:760px){ /* Warsztat: zbij pion, by 4 schematy zmiescily sie w 100vh telefonu (max-height:88vh + overflow:hidden przycinal 4. schemat) */
+    .draft-copy{max-width:100%;max-height:none}
+    .draft-copy .dhead{margin-bottom:.85rem}
+    .draft-copy h3{font-size:1.45rem;margin-bottom:.55rem}
+    .draft-copy .dlede{font-size:13px;line-height:1.45}
+    .sdiv{margin:.7rem 0}
+    .schem{padding-left:2.5rem}
+    .schem .sname{font-size:1.1rem;margin-bottom:.3rem}
+    .schem p{font-size:12.5px;line-height:1.4}
+  }
 
   /* ============ KUŹNIA / THE FORGE ============ */
   #forge{position:absolute;inset:0;z-index:54;overflow:hidden;background:#000;opacity:0;pointer-events:none}

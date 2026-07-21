@@ -75,7 +75,7 @@ export default async function handler(req, res) {
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;color:#23252A">
       <p style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#8E6945;margin:0 0 12px">
-        The Hearth - new message
+        WEBDEVCAVEMAN - new message
       </p>
       <p><strong>${esc(n)}</strong><br>
       <a href="mailto:${esc(e)}">${esc(e)}</a></p>
@@ -91,7 +91,7 @@ export default async function handler(req, res) {
         from,
         to: [to],
         reply_to: e,
-        subject: `The Hearth - ${n}`,
+        subject: `WEBDEVCAVEMAN - ${n}`,
         html,
       }),
     });
