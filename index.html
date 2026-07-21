@@ -1806,7 +1806,7 @@
       }).then(function(){ reveal(); })
       .catch(function(){
         btn.disabled=false; btn.textContent='Send it down the mountain \u2192';
-        fail.textContent='The message didn\u2019t get through. Try again, or write to me on LinkedIn.';
+        fail.innerHTML='The message didn\u2019t get through. Try again, or write to me on <a href="https://www.linkedin.com/in/krzysztof-piekarz-987642168/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">LinkedIn</a>.';
       });
     });
 
