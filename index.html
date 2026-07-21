@@ -17,7 +17,10 @@
   .stage{position:fixed;inset:0;overflow:hidden;background:var(--graphite)}
 
   /* ============ HERO ============ */
-  #hero{position:absolute;inset:0;z-index:100;overflow:hidden;background:var(--graphite);transition:opacity 1s ease}
+  /* BEZ transition na opacity: Hero gasnie przez fadeSection (inline opacity co klatke, sterowane
+     scrollem) - tranzycja 1s lagowala kazda zmiane (mety, potem skok od visibility:hidden). Klasa
+     .gone (jedyny inny user) nie jest uzywana. Ruch wygladza sam lerp aboutP w tickAbout. */
+  #hero{position:absolute;inset:0;z-index:100;overflow:hidden;background:var(--graphite)}
   #hero.gone{opacity:0;pointer-events:none}
   .frame{position:absolute;inset:0;opacity:0;background-size:cover;background-position:center;will-change:opacity,transform}
   #f0{background-image:url("assets/hero-gate-0.webp")}
@@ -50,14 +53,16 @@
   .skip.hidden{opacity:0;pointer-events:none}
 
   /* ============ ABOUT ============ */
-  #about{position:absolute;inset:0;z-index:50;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #about{position:absolute;inset:0;z-index:50;overflow:hidden;background:#000;opacity:0;pointer-events:none}
   #about.active{opacity:1;pointer-events:auto}
   /* UWAGA: will-change NIE jest tu ustawione na stale.
      27 warstw .bgimg x pelnoekranowa tekstura = ~160 MB pamieci GPU przy 1440p.
      Gdy jej brakuje, przegladarka wyrzuca i odtwarza warstwy w trakcie animacji,
      co dawalo migotanie/artefakty od Kuzni w gore (pierwsza sekcja z 7 warstwami).
      Zamiast tego promujemy do warstwy kompozytowej TYLKO aktywna sekcje (.active). */
-  .bgimg{position:absolute;inset:0;width:100%;height:100%;background-size:cover;background-position:center;
+  /* inset:-2px = staly overscan: przy scale() schodzacym do 1.0 rasteryzacja GPU nie odslania
+     1px szwu #000 na krawedzi. Sekcja ma overflow:hidden, wiec nadmiar jest przyciety. */
+  .bgimg{position:absolute;inset:-2px;background-size:cover;background-position:center;
     transform:translateZ(0);backface-visibility:hidden}
   #about.active .bgimg,#career.active .bgimg,#drafting.active .bgimg,
   #forge.active .bgimg,#atelier.active .bgimg,#planning.active .bgimg,#library.active .bgimg,#hearth.active .bgimg{will-change:transform,opacity}
@@ -87,7 +92,7 @@
   .maker-note{margin-top:2.2rem;padding-top:1.6rem;border-top:1px solid var(--line);font-family:'Spectral',serif;font-style:italic;font-size:1.05rem;line-height:1.5;color:var(--fire);opacity:.85}
 
   /* ============ CAREER (Three Roads) ============ */
-  #career{position:absolute;inset:0;z-index:52;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #career{position:absolute;inset:0;z-index:52;overflow:hidden;background:#000;opacity:0;pointer-events:none}
   #career.active{opacity:1;pointer-events:auto}
   #cmap{background-image:url("assets/career-map.webp");z-index:1}
   #cland1{background-image:url("assets/career-land-1.webp");z-index:2;opacity:0}
@@ -131,7 +136,7 @@
   @media (max-width:760px){ .cland-copy{max-width:100%} }
 
   /* ============ WARSZTAT / THE DRAFTING ROOM ============ */
-  #drafting{position:absolute;inset:0;z-index:53;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #drafting{position:absolute;inset:0;z-index:53;overflow:hidden;background:#000;opacity:0;pointer-events:none}
   #drafting.active{opacity:1;pointer-events:auto}
   #dThresh{background-image:url("assets/drafting-threshold.webp");z-index:3}
   #dOutward{background-image:url("assets/drafting-outward.webp");z-index:2;opacity:0}
@@ -172,7 +177,7 @@
   @media (max-width:760px){ .draft-copy{max-width:100%} .schem p{font-size:13.5px} }
 
   /* ============ KUŹNIA / THE FORGE ============ */
-  #forge{position:absolute;inset:0;z-index:54;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #forge{position:absolute;inset:0;z-index:54;overflow:hidden;background:#000;opacity:0;pointer-events:none}
   #forge.active{opacity:1;pointer-events:auto}
   #fCorridor{background-image:url("assets/forge-corridor.webp");z-index:7}
   #fMsi{background-image:url("assets/forge-msi.webp");z-index:6;opacity:0}
@@ -196,7 +201,7 @@
   .fwrapWide{position:absolute;inset:0;z-index:11;display:flex;align-items:center;justify-content:center;padding:4vh 5vw;pointer-events:none}
 
   /* ========== ATELIER (Lokacja 6) ========== */
-  #atelier{position:absolute;inset:0;z-index:56;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #atelier{position:absolute;inset:0;z-index:56;overflow:hidden;background:#000;opacity:0;pointer-events:none}
   #atelier.active{opacity:1;pointer-events:auto}
   /* z-index maleje wg narracji (wzorzec 10.5): odslanianie, nie mieszanie */
   #aThresh{background-image:url("assets/atelier-threshold.webp");z-index:7;opacity:1}
@@ -241,7 +246,7 @@
   @media (max-width:900px){ .atelier-copy{max-width:20rem} }
 
   /* ========== SALA PLANOW (Lokacja 7) ========== */
-  #planning{position:absolute;inset:0;z-index:58;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #planning{position:absolute;inset:0;z-index:58;overflow:hidden;background:#000;opacity:0;pointer-events:none}
   #planning.active{opacity:1;pointer-events:auto}
   #pThresh{background-image:url("assets/planning-threshold.webp");z-index:3;opacity:1}
   #pRadar{background-image:url("assets/planning-radar.webp");z-index:2;opacity:0}
@@ -280,7 +285,7 @@
   }
 
   /* ========== BIBLIOTEKA (Lokacja 8) ========== */
-  #library{position:absolute;inset:0;z-index:59;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #library{position:absolute;inset:0;z-index:59;overflow:hidden;background:#000;opacity:0;pointer-events:none}
   #library.active{opacity:1;pointer-events:auto}
   #lThresh{background-image:url("assets/library-threshold.webp");z-index:3;opacity:1}
   #lDesk{background-image:url("assets/library-desk.webp");z-index:2;opacity:0}
@@ -322,7 +327,7 @@
   }
 
   /* ========== PALENISKO (Lokacja 9) ========== */
-  #hearth{position:absolute;inset:0;z-index:60;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #hearth{position:absolute;inset:0;z-index:60;overflow:hidden;background:#000;opacity:0;pointer-events:none}
   #hearth.active{opacity:1;pointer-events:auto}
   #hRoom{background-image:url("assets/hearth-room.webp");z-index:2;opacity:1}
   #hearthVign{position:absolute;inset:0;z-index:8;pointer-events:none;
@@ -1185,6 +1190,17 @@
     el.style.visibility = live ? 'visible' : 'hidden';
   }
 
+  // Wejscie nowej sekcji = 1s CSS-fade jej kontenera (.active: opacity 0->1). Zamiast gasic
+  // poprzednia RUWNOLEGLE (dawne 1-p/0.12), TRZYMAMY ja w pelni kryta pod spodem, dopoki nowa
+  // nie skryje (io>=1) - wtedy wycinamy (niewidocznie). Bez tego obie warstwy sa ~50% nad #000
+  // -> ciemne mignienie + duch poprzedniej sceny. Guard .active: nie wskrzeszamy sekcji zgaszonej
+  // skokiem z menu (clearAllSections zdejmuje .active). Dziala tez wstecz (nowa gasnie, odslania spodnia).
+  function holdUnder(incoming, outgoing){
+    var io = parseFloat(getComputedStyle(incoming).opacity) || 0;
+    var hold = outgoing.classList.contains('active') && io < 0.999;
+    fadeSection(outgoing, hold ? 1 : 0);
+  }
+
   function cl(v,a,b){return Math.min(b,Math.max(a,v));}
   var aboutP=0, aboutTarget=0, descended=false;
   function renderAbout(p){
@@ -1270,9 +1286,8 @@
 
   function renderCareer(p){
     if(p>0.05) careerEntered=true;
-    // ABOUT (kruzganek) gasnie plynnie w pierwszych 12% - wejscie do sali map
-    var aboutFade=cl(1-p/0.12,0,1);
-    fadeSection(aboutEl,aboutFade);
+    // ABOUT trzymane w pelni kryte pod Career, dopoki Career nie skryje (patrz holdUnder)
+    holdUnder(careerEl,aboutEl);
     // powrot do About gdy zjedziemy do samego poczatku
     if(careerEntered && p<=0.01 && state==='career'){
       state='about'; careerEntered=false;
@@ -1373,9 +1388,8 @@
 
   function renderDrafting(p){
     if(p>0.05) draftEntered=true;
-    // Career gasnie plynnie w pierwszych 12% - wejscie do sali kreslarskiej
-    var careerFade=cl(1-p/0.12,0,1);
-    fadeSection(careerEl,careerFade);
+    // Career trzymane kryte pod Warsztatem, dopoki Warsztat nie skryje (patrz holdUnder)
+    holdUnder(draftingEl,careerEl);
     // powrot do Career gdy zjedziemy do samego poczatku
     if(draftEntered && p<=0.01 && state==='drafting'){
       state='career'; draftEntered=false;
@@ -1453,9 +1467,8 @@
 
   function renderForge(p){
     if(p>0.05) forgeEntered=true;
-    // Warsztat gasnie w pierwszych 12%
-    var draftFade=cl(1-p/0.12,0,1);
-    fadeSection(draftingEl,draftFade);
+    // Warsztat trzymany kryty pod Kuznia, dopoki Kuznia nie skryje (patrz holdUnder)
+    holdUnder(forgeEl,draftingEl);
     // powrot do Warsztatu
     if(forgeEntered && p<=0.01 && state==='forge'){
       state='drafting'; forgeEntered=false;
@@ -1477,24 +1490,25 @@
     fCorridor.style.opacity=String(cl(1-(p-(F_START-0.04))/0.06,0,1));
     fThreshHead.classList.toggle('show', p<0.13);
 
-    // --- 6 komnat: odslanianie + reveal copy ---
-    var active=-1, sideNow=null;
+    // --- 6 komnat: MIEKKIE ODSLANIANIE (krotki blend) + reveal copy ---
+    // hold-bottom+fade-top: dolna komnata trzymana na pelnym opacity (brak czerni), gorna gasnie
+    // przez KROTKIE okno 0.04 (dawniej 0.06). Krotszy blend = mniej "podwojnego" pojasnienia, ale
+    // zostaje troche miekkosci (nie twardy skok). ci (indeks biezacej komnaty) steruje CIENIEM.
+    var ci = (p >= F_START-0.04) ? cl(Math.floor((p-(F_START-0.04))/F_SPAN),0,5) : -1;
+    var sideNow = (ci>=0) ? fSide[ci] : null;
     for(var i=0;i<6;i++){
-      var s=F_START+i*F_SPAN;          // start komnaty
-      // warstwa jest w pelni widoczna od momentu, gdy zaczyna sie jej czas...
+      var s=F_START+i*F_SPAN;
       var on = p > (s-0.04) ? 1 : 0;
-      // ...i gasnie dopiero gdy wchodzi nastepna (ostatnia nie gasnie nigdy)
-      var fade = (i<5)? cl(1-(p-(s+F_SPAN-0.04))/0.06,0,1) : 1;
-      var o=on*fade;
-      fBg[i].style.opacity=String(o);
+      var fade = (i<5) ? cl(1-(p-(s+F_SPAN-0.04))/0.04,0,1) : 1;
+      fBg[i].style.opacity=String(on*fade);
       fBg[i].style.transform='scale('+(1.05-cl((p-(s-0.04))/0.35,0,1)*0.05)+')';
       // copy widoczne w srodkowej czesci okna komnaty
       var vis = p>(s+0.02) && p<(s+F_SPAN-0.03);
       if(fCopy[i]) fCopy[i].classList.toggle('show', vis);
-      if(vis){ active=i; sideNow=fSide[i]; }
     }
 
-    // shade wg strony copy aktywnej komnaty (WIDE = przyciemnienie calego kadru)
+    // shade podaza za BIEZACA komnata (nie za widocznoscia copy) - koniec luki, w ktorej
+    // oba cienie spadaly do 0 i kadr pojasnial miedzy komnatami. (WIDE = caly kadr)
     fshadeR.style.opacity = (sideNow==='R') ? '1' : '0';
     fshadeL.style.opacity = (sideNow==='L') ? '1' : '0';
     fshadeC.style.opacity = (sideNow==='WIDE') ? '1' : '0';
@@ -1535,9 +1549,8 @@
 
   function renderAtelier(p){
     if(p>0.05) atelierEntered=true;
-    // Kuznia gasnie w pierwszych 12%
-    var forgeFade=cl(1-p/0.12,0,1);
-    fadeSection(forgeEl,forgeFade);
+    // Kuznia trzymana kryta pod Atelier, dopoki Atelier nie skryje (patrz holdUnder)
+    holdUnder(atelierEl,forgeEl);
     // powrot do Kuzni
     if(atelierEntered && p<=0.01 && state==='atelier'){
       state='forge'; atelierEntered=false;
@@ -1556,18 +1569,18 @@
     aThresh.style.opacity=String(cl(1-(p-(A_START-0.04))/0.06,0,1));
     aThreshHead.classList.toggle('show', p<0.13);
 
-    // --- 6 witrazy: ODSLANIANIE (wzorzec 10.5) ---
-    var sideNow=null;
+    // --- 6 witrazy: MIEKKIE ODSLANIANIE (krotki blend 0.04) - patrz Kuznia. ---
+    var ci = (p >= A_START-0.04) ? cl(Math.floor((p-(A_START-0.04))/A_SPAN),0,5) : -1;
+    var sideNow = (ci>=0) ? aSide[ci] : null;
     for(var i=0;i<6;i++){
       var st=A_START+i*A_SPAN;
       var on = p > (st-0.04) ? 1 : 0;
-      var fade = (i<5)? cl(1-(p-(st+A_SPAN-0.04))/0.06,0,1) : 1;
+      var fade = (i<5) ? cl(1-(p-(st+A_SPAN-0.04))/0.04,0,1) : 1;
       aBg[i].style.opacity=String(on*fade);
       // witraz oddycha delikatnie - swiatlo za szklem
       aBg[i].style.transform='scale('+(1.04-cl((p-(st-0.04))/0.35,0,1)*0.04)+')';
       var vis = p>(st+0.02) && p<(st+A_SPAN-0.03);
       if(aCopy[i]) aCopy[i].classList.toggle('show', vis);
-      if(vis) sideNow=aSide[i];
     }
     ashadeR.style.opacity = (sideNow==='R') ? '1' : '0';
     ashadeL.style.opacity = (sideNow==='L') ? '1' : '0';
@@ -1604,8 +1617,7 @@
 
   function renderPlanning(p){
     if(p>0.05) planEntered=true;
-    var atelFade=cl(1-p/0.12,0,1);
-    fadeSection(atelierEl,atelFade);
+    holdUnder(planningEl,atelierEl);
     if(planEntered && p<=0.01 && state==='planning'){
       state='atelier'; planEntered=false;
       planTarget=0; planP=0;
@@ -1623,17 +1635,17 @@
     pThresh.style.opacity=String(cl(1-(p-(P_START-0.05))/0.07,0,1));
     pThreshHead.classList.toggle('show', p<0.18);
 
-    // --- 2 plany: ODSLANIANIE (wzorzec 10.5) ---
-    var sideNow=null;
+    // --- 2 plany: MIEKKIE ODSLANIANIE (krotki blend 0.05) - patrz Kuznia. ---
+    var ci = (p >= P_START-0.05) ? cl(Math.floor((p-(P_START-0.05))/P_SPAN),0,1) : -1;
+    var sideNow = (ci>=0) ? pSide[ci] : null;
     for(var i=0;i<2;i++){
       var st=P_START+i*P_SPAN;
       var on = p > (st-0.05) ? 1 : 0;
-      var fade = (i<1)? cl(1-(p-(st+P_SPAN-0.05))/0.07,0,1) : 1;
+      var fade = (i<1) ? cl(1-(p-(st+P_SPAN-0.05))/0.05,0,1) : 1;
       pBg[i].style.opacity=String(on*fade);
       pBg[i].style.transform='scale('+(1.05-cl((p-(st-0.05))/0.4,0,1)*0.05)+')';
       var vis = p>(st+0.03) && p<(st+P_SPAN-0.03);
       if(pCopy[i]) pCopy[i].classList.toggle('show', vis);
-      if(vis) sideNow=pSide[i];
     }
     pshadeR.style.opacity = (sideNow==='R') ? '1' : '0';
     pshadeL.style.opacity = (sideNow==='L') ? '1' : '0';
@@ -1672,8 +1684,7 @@
 
   function renderLibrary(p){
     if(p>0.05) libEntered=true;
-    var planFade=cl(1-p/0.12,0,1);
-    fadeSection(planningEl,planFade);
+    holdUnder(libraryEl,planningEl);
     if(libEntered && p<=0.01 && state==='library'){
       state='planning'; libEntered=false;
       libTarget=0; libP=0;
@@ -1691,17 +1702,17 @@
     lThresh.style.opacity=String(cl(1-(p-(L_START-0.05))/0.07,0,1));
     lThreshHead.classList.toggle('show', p<0.18);
 
-    // --- 2 polki: ODSLANIANIE (wzorzec 10.5) ---
-    var sideNow=null;
+    // --- 2 polki: MIEKKIE ODSLANIANIE (krotki blend 0.05) - patrz Kuznia. ---
+    var ci = (p >= L_START-0.05) ? cl(Math.floor((p-(L_START-0.05))/L_SPAN),0,1) : -1;
+    var sideNow = (ci>=0) ? lSide[ci] : null;
     for(var i=0;i<2;i++){
       var st=L_START+i*L_SPAN;
       var on = p > (st-0.05) ? 1 : 0;
-      var fade = (i<1)? cl(1-(p-(st+L_SPAN-0.05))/0.07,0,1) : 1;
+      var fade = (i<1) ? cl(1-(p-(st+L_SPAN-0.05))/0.05,0,1) : 1;
       lBg[i].style.opacity=String(on*fade);
       lBg[i].style.transform='scale('+(1.05-cl((p-(st-0.05))/0.4,0,1)*0.05)+')';
       var vis = p>(st+0.03) && p<(st+L_SPAN-0.03);
       if(lCopy[i]) lCopy[i].classList.toggle('show', vis);
-      if(vis) sideNow=lSide[i];
     }
     lshadeL.style.opacity = (sideNow==='L') ? '1' : '0';
     lshadeR.style.opacity = (sideNow==='R') ? '1' : '0';
@@ -1735,8 +1746,7 @@
 
   function renderHearth(p){
     if(p>0.05) hearthEntered=true;
-    var libFade=cl(1-p/0.12,0,1);
-    fadeSection(libraryEl,libFade);
+    holdUnder(hearthEl,libraryEl);
     if(hearthEntered && p<=0.01 && state==='hearth'){
       state='library'; hearthEntered=false;
       hearthTarget=0; hearthP=0;
