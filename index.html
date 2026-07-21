@@ -95,6 +95,9 @@
   #cland3{background-image:url("assets/career-land-3.webp");z-index:2;opacity:0}
   #careerVign{position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse 80% 80% at 50% 45%,transparent 42%,rgba(0,0,0,.5) 100%)}
   #atmoCareer{position:absolute;inset:0;z-index:5;pointer-events:none;mix-blend-mode:screen}
+  /* atmosfera lokacji 4-9: jeden silnik, preset per lokacja. Nad tlem/vign, pod shade+copy. */
+  .atmoScene{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;z-index:8}
+  #drafting .atmoScene{z-index:4} /* Warsztat: shade z5, copy z7 - canvas musi byc nizej */
   /* copy shades - L and R variants */
   .cshadeL{position:absolute;inset:0;z-index:6;pointer-events:none;opacity:0;transition:opacity .8s ease;
     background:linear-gradient(90deg,rgba(35,37,42,.93) 0%,rgba(35,37,42,.7) 26%,rgba(35,37,42,.1) 52%,rgba(35,37,42,0) 66%)}
@@ -609,6 +612,7 @@
     <div class="bgimg" id="dOutward"></div>
     <div class="bgimg" id="dThresh"></div>
     <div id="draftVign"></div>
+    <canvas class="atmoScene" id="atmoDraft"></canvas>
 
     <!-- ekran przejsciowy: copy overlay jak brama Hero->About -->
     <div class="transHead draftThreshHead" id="dThreshHead">
@@ -702,6 +706,7 @@
     <div class="bgimg" id="fMsi"></div>
     <div class="bgimg" id="fCorridor"></div>
     <div id="forgeVign"></div>
+    <canvas class="atmoScene" id="atmoForge"></canvas>
 
     <!-- ekran-zawias: korytarz z drzwiami + krotkie copy -->
     <div class="transHead forgeThreshHead" id="fThreshHead">
@@ -805,6 +810,7 @@
     <div class="bgimg" id="aHomer"></div>
     <div class="bgimg" id="aThresh"></div>
     <div id="atelierVign"></div>
+    <canvas class="atmoScene" id="atmoAtelier"></canvas>
 
     <!-- ekran-brama: galeria + krasnolud + runa -->
     <div class="transHead atelierThreshHead" id="aThreshHead">
@@ -915,6 +921,7 @@
     <div class="bgimg" id="pRadar"></div>
     <div class="bgimg" id="pThresh"></div>
     <div id="planningVign"></div>
+    <canvas class="atmoScene" id="atmoPlanning"></canvas>
 
     <!-- ekran-brama: pusta hala + krasnolud + runa -->
     <div class="transHead planningThreshHead" id="pThreshHead">
@@ -964,6 +971,7 @@
     <div class="bgimg" id="lDesk"></div>
     <div class="bgimg" id="lThresh"></div>
     <div id="libraryVign"></div>
+    <canvas class="atmoScene" id="atmoLibrary"></canvas>
 
     <!-- ekran-brama: skryptorium + krasnolud przy pulpicie + runa w zworniku -->
     <div class="transHead libraryThreshHead" id="lThreshHead">
@@ -1011,6 +1019,7 @@
   <div id="hearth">
     <div class="bgimg" id="hRoom"></div>
     <div id="hearthVign"></div>
+    <canvas class="atmoScene" id="atmoHearth"></canvas>
     <div class="hshade" id="hshade"></div>
 
     <div class="hwrap">
@@ -2199,6 +2208,74 @@
     requestAnimationFrame(loopC);
   }
   if(!reduce) loopC();
+
+  /* ========== ATMOSFERA LOKACJI 4-9 (jeden silnik, preset per lokacja) ==========
+     Ruch nalezy do MIEJSCA, nie do ekranu: jedna atmosfera na cala lokacje niezaleznie
+     od tego, ktory ekran copy czytasz. Emisja tylko gdy copy widoczne (.show) -> nigdy
+     na ekranach przejsciowych (prog/brama). Dwa archetypy: 'dust' (pylki w gore) i
+     'ember' (zar). Presety re-parametryzuja czastki juz uzyte w Hero/Career. */
+  (function(){
+    var PRESET={
+      drafting:{kind:'dust', n:24, col:'224,222,214', rise:[0.00008,0.0002],  drift:0.00018, op:[0.06,0.2],  rad:[0.4,1.1]}, // Warsztat: pyl kreslarski (cieplejszy neutralny - chlodna szarosc ginela na ciemnym tle)
+      forge:   {kind:'ember',n:16, col:'243,197,106', xr:[0.08,0.84], yb:[0.72,0.26], vy:[0.0006,0.0013], rad:[0.4,1.1], op:0.7},  // Kuznia: zar z dolu, szeroko
+      atelier: {kind:'dust', n:24, col:'240,224,198', rise:[0.0001,0.00022],  drift:0.00012, op:[0.06,0.2],  rad:[0.4,1.2]},  // Atelier: cieple swietliste motyle swiatla
+      planning:{kind:'dust', n:18, col:'220,224,220', rise:[0.00006,0.00016], drift:0.0001,  op:[0.06,0.18], rad:[0.5,1.1]},  // Sala Planow: spokojny, rzadki (rozjasniony - wczesniej ginal)
+      library: {kind:'dust', n:32, col:'238,226,200', rise:[0.00008,0.0002],  drift:0.00006, op:[0.06,0.22], rad:[0.4,1.3]},  // Biblioteka: pyl w smudze swiatla, pergamin
+      hearth:  {kind:'ember',n:10, col:'243,197,106', xr:[0.04,0.2], yb:[0.7,0.24],  vy:[0.0005,0.0011], rad:[0.4,1.0], op:0.45} // Palenisko: delikatny zar Z PALENISKA (lewa strona kadru), wyciszony
+    };
+    var DEF=[['drafting','atmoDraft','.draft-copy'],['forge','atmoForge','.forge-copy'],
+             ['atelier','atmoAtelier','.atelier-copy'],['planning','atmoPlanning','.planning-copy'],
+             ['library','atmoLibrary','.library-copy'],['hearth','atmoHearth','.hearth-copy']];
+    var scenes={};
+    DEF.forEach(function(d){ var c=document.getElementById(d[1]); if(!c)return;
+      scenes[d[0]]={el:document.getElementById(d[0]),cv:c,ctx:c.getContext('2d'),
+                    sel:d[2],p:PRESET[d[0]],str:0,dust:[],emb:[],init:false}; });
+    function sizeAll(){ for(var k in scenes){ scenes[k].cv.width=innerWidth; scenes[k].cv.height=innerHeight; } }
+    sizeAll(); addEventListener('resize',sizeAll); window.addEventListener('load',sizeAll);
+    if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(sizeAll); }
+    setTimeout(sizeAll,300);
+
+    function seedDust(s){ var p=s.p; s.dust=[]; for(var i=0;i<p.n;i++)s.dust.push({
+      x:Math.random(),y:Math.random(),r:p.rad[0]+Math.random()*p.rad[1],
+      v:p.rise[0]+Math.random()*p.rise[1],d:(Math.random()-.5)*p.drift,
+      o:p.op[0]+Math.random()*p.op[1]}); s.init=true; }
+    function mkEmb(p){ return{x:p.xr[0]+Math.random()*p.xr[1],y:p.yb[0]+Math.random()*p.yb[1],
+      vx:(Math.random()-.5)*.0004,vy:-(p.vy[0]+Math.random()*p.vy[1]),
+      life:0,max:110+Math.random()*160,r:p.rad[0]+Math.random()*p.rad[1]}; }
+
+    var prev=null;
+    function loopS(){ if(reduce)return;
+      var cur=scenes[state]||null;
+      if(prev&&prev!==cur){ prev.ctx.clearRect(0,0,prev.cv.width,prev.cv.height); prev.emb.length=0; prev.str=0; }
+      prev=cur;
+      if(!cur){ requestAnimationFrame(loopS); return; }
+      var W=cur.cv.width,H=cur.cv.height,ctx=cur.ctx;
+      ctx.clearRect(0,0,W,H);
+      // gest steruje ktore copy jest widoczne; brak widocznego copy = ekran przejsciowy = cisza
+      var tgt=cur.el.querySelector(cur.sel+'.show')?1:0;
+      cur.str+=(tgt-cur.str)*0.06;
+      if(cur.str<0.02){ requestAnimationFrame(loopS); return; }
+      var p=cur.p, st=cur.str;
+      if(p.kind==='dust'){
+        if(!cur.init)seedDust(cur);
+        for(var i=0;i<cur.dust.length;i++){ var dd=cur.dust[i];
+          dd.y-=dd.v; dd.x+=dd.d; if(dd.y<0){dd.y=1;dd.x=Math.random();}
+          ctx.beginPath(); ctx.fillStyle='rgba('+p.col+','+(dd.o*st)+')';
+          ctx.arc(dd.x*W,dd.y*H,dd.r,0,6.28); ctx.fill(); }
+      } else {
+        var want=Math.round(st*p.n);
+        while(cur.emb.length<want)cur.emb.push(mkEmb(p));
+        for(var k=cur.emb.length-1;k>=0;k--){ var e=cur.emb[k];
+          e.x+=e.vx; e.y+=e.vy; e.life++;
+          var a=Math.max(0,1-e.life/e.max)*st*p.op;
+          ctx.beginPath(); ctx.fillStyle='rgba('+p.col+','+a+')';
+          ctx.arc(e.x*W,e.y*H,e.r,0,6.28); ctx.fill();
+          if(e.life>=e.max)cur.emb.splice(k,1); }
+      }
+      requestAnimationFrame(loopS);
+    }
+    if(!reduce)loopS();
+  })();
 })();
 </script>
 </body>
