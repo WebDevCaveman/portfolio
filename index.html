@@ -1,0 +1,2205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krzysztof Piekarz — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500&family=Archivo:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{ --graphite:#23252A; --stone:#57514B; --parchment:#DDD2BF; --bronze:#8E6945;
+    --runic:#4C89AE; --amber:#D68B39; --fire:#F3C56A; --moss:#5B6650; --fog:#BFC2C3;
+    --panel:#282A30; --line:rgba(87,81,75,.45); }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:var(--graphite);color:var(--parchment);
+    font-family:'Archivo',system-ui,sans-serif}
+  .stage{position:fixed;inset:0;overflow:hidden;background:var(--graphite)}
+
+  /* ============ HERO ============ */
+  #hero{position:absolute;inset:0;z-index:100;overflow:hidden;background:var(--graphite);transition:opacity 1s ease}
+  #hero.gone{opacity:0;pointer-events:none}
+  .frame{position:absolute;inset:0;opacity:0;background-size:cover;background-position:center;will-change:opacity,transform}
+  #f0{background-image:url("assets/hero-gate-0.webp")}
+  #f1{background-image:url("assets/hero-gate-1.webp")}
+  #f2{background-image:url("assets/hero-gate-2.webp")}
+  #f3{background-image:url("assets/hero-gate-3.webp")}
+  #atmoHero{position:absolute;inset:0;z-index:9;opacity:0;pointer-events:none;transition:opacity 1.4s ease;mix-blend-mode:screen}
+  #atmoHero.show{opacity:1}
+  .copyshade{position:absolute;inset:0;z-index:8;opacity:0;pointer-events:none;transition:opacity 1.2s ease;
+    background:linear-gradient(90deg,rgba(35,37,42,.94) 0%,rgba(35,37,42,.74) 26%,rgba(35,37,42,.12) 52%,rgba(35,37,42,0) 66%)}
+  .copyshade.show{opacity:1}
+  .wrap{position:absolute;inset:0;z-index:10;padding:0 6vw;display:flex;align-items:center;pointer-events:none}
+  .copyHero{max-width:34rem;opacity:0;transition:opacity 1.6s ease 0.4s;pointer-events:auto}
+  .copyHero.show{opacity:1}
+  .eyebrow{font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--runic);margin-bottom:1.5rem}
+  #hero h1{font-family:'Spectral',serif;font-weight:500;font-size:clamp(2.6rem,4.6vw,4.5rem);line-height:1.05;color:var(--parchment);text-shadow:0 2px 40px rgba(0,0,0,.6)}
+  #hero h1 .warm{color:var(--fire)}
+  .sub{margin-top:1.5rem;font-size:17px;line-height:1.65;color:var(--parchment);opacity:.86;max-width:46ch}
+  .scrollhint{position:absolute;bottom:4vh;left:50%;transform:translateX(-50%);z-index:12;
+    display:flex;flex-direction:column;align-items:center;gap:.7rem;
+    opacity:0;transition:opacity 1.4s ease 1s;pointer-events:none;text-align:center}
+  .scrollhint.show{opacity:1}
+  .scrollhint .hintlabel{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;
+    letter-spacing:2.5px;text-transform:uppercase;color:var(--parchment);opacity:.72}
+  .scrollhint .hintrune{display:inline-block;color:var(--fire);animation:runefall 1.9s ease-in-out infinite}
+  .scrollhint .hintrune svg{display:block}
+  @keyframes runefall{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(4px);opacity:1}}
+  .skip{position:absolute;bottom:3vh;right:3vw;z-index:20;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:var(--fog);opacity:.5;cursor:pointer;text-transform:lowercase;background:none;border:none;transition:opacity .4s}
+  .skip:hover{opacity:.9}
+  .skip.hidden{opacity:0;pointer-events:none}
+
+  /* ============ ABOUT ============ */
+  #about{position:absolute;inset:0;z-index:50;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #about.active{opacity:1;pointer-events:auto}
+  /* UWAGA: will-change NIE jest tu ustawione na stale.
+     27 warstw .bgimg x pelnoekranowa tekstura = ~160 MB pamieci GPU przy 1440p.
+     Gdy jej brakuje, przegladarka wyrzuca i odtwarza warstwy w trakcie animacji,
+     co dawalo migotanie/artefakty od Kuzni w gore (pierwsza sekcja z 7 warstwami).
+     Zamiast tego promujemy do warstwy kompozytowej TYLKO aktywna sekcje (.active). */
+  .bgimg{position:absolute;inset:0;width:100%;height:100%;background-size:cover;background-position:center;
+    transform:translateZ(0);backface-visibility:hidden}
+  #about.active .bgimg,#career.active .bgimg,#drafting.active .bgimg,
+  #forge.active .bgimg,#atelier.active .bgimg,#planning.active .bgimg,#library.active .bgimg,#hearth.active .bgimg{will-change:transform,opacity}
+  #cloi{background-image:url("assets/about-cloister.webp");z-index:1;opacity:0}
+  #hall{background-image:url("assets/about-hall.webp");z-index:2}
+  #trans{background-image:url("assets/about-threshold.webp");z-index:3}
+  #transVign{position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse 75% 75% at 50% 45%,transparent 38%,rgba(0,0,0,.55) 100%)}
+  #atmoAbout{position:absolute;inset:0;z-index:5;pointer-events:none;mix-blend-mode:screen}
+  #shadeHall{position:absolute;inset:0;z-index:6;pointer-events:none;opacity:0;
+    background:linear-gradient(270deg,rgba(35,37,42,.94) 0%,rgba(35,37,42,.72) 26%,rgba(35,37,42,.1) 52%,rgba(35,37,42,0) 66%)}
+  .wrapHall{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:flex-end;padding:0 6vw;pointer-events:none}
+  .copyHall{max-width:34rem;opacity:0;transform:translateY(24px);transition:opacity 1s ease,transform 1s ease}
+  .copyHall.show{opacity:1;transform:translateY(0)}
+  #shadeCloi{position:absolute;inset:0;z-index:6;pointer-events:none;opacity:0;background:rgba(20,21,25,.55)}
+  .wrapCloi{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5vh 6vw;opacity:0;transition:opacity 1s ease;pointer-events:none}
+  .wrapCloi.show{opacity:1}
+  .cloiHead{font-family:'Spectral',serif;font-weight:500;font-size:clamp(1.5rem,2.6vw,2.3rem);color:var(--parchment);text-align:center;margin-bottom:3.5vh;text-shadow:0 2px 24px rgba(0,0,0,.9)}
+  .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:3vw;max-width:1200px;width:100%}
+  .col{text-align:center;padding:0 1rem}
+  .col .school{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--fog);opacity:.7;margin-bottom:.3rem;text-transform:uppercase}
+  .col .field{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:1px;color:var(--amber);margin-bottom:1rem;text-transform:uppercase}
+  .col .ctitle{font-family:'Spectral',serif;font-weight:500;font-size:1.35rem;color:var(--parchment);margin-bottom:1rem}
+  .col .cdesc{font-size:14.5px;line-height:1.6;color:var(--parchment);opacity:.82}
+  #about h2{font-family:'Spectral',serif;font-weight:500;font-size:clamp(1.9rem,3.2vw,3rem);line-height:1.1;color:var(--parchment);margin-bottom:2rem;text-shadow:0 2px 30px rgba(0,0,0,.85)}
+  #about .eyebrow{margin-bottom:1.5rem}
+  .body p{font-size:17px;line-height:1.7;color:var(--parchment);opacity:.9;margin-bottom:1.2rem}
+  .maker-note{margin-top:2.2rem;padding-top:1.6rem;border-top:1px solid var(--line);font-family:'Spectral',serif;font-style:italic;font-size:1.05rem;line-height:1.5;color:var(--fire);opacity:.85}
+
+  /* ============ CAREER (Three Roads) ============ */
+  #career{position:absolute;inset:0;z-index:52;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #career.active{opacity:1;pointer-events:auto}
+  #cmap{background-image:url("assets/career-map.webp");z-index:1}
+  #cland1{background-image:url("assets/career-land-1.webp");z-index:2;opacity:0}
+  #cland2{background-image:url("assets/career-land-2.webp");z-index:2;opacity:0}
+  #cland3{background-image:url("assets/career-land-3.webp");z-index:2;opacity:0}
+  #careerVign{position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse 80% 80% at 50% 45%,transparent 42%,rgba(0,0,0,.5) 100%)}
+  #atmoCareer{position:absolute;inset:0;z-index:5;pointer-events:none;mix-blend-mode:screen}
+  /* copy shades - L and R variants */
+  .cshadeL{position:absolute;inset:0;z-index:6;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(90deg,rgba(35,37,42,.93) 0%,rgba(35,37,42,.7) 26%,rgba(35,37,42,.1) 52%,rgba(35,37,42,0) 66%)}
+  .cshadeR{position:absolute;inset:0;z-index:6;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(270deg,rgba(35,37,42,.93) 0%,rgba(35,37,42,.7) 26%,rgba(35,37,42,.1) 52%,rgba(35,37,42,0) 66%)}
+  /* copy wraps */
+  .cwrapL{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:flex-start;padding:0 6vw;pointer-events:none}
+  .cwrapR{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:flex-end;padding:0 6vw;pointer-events:none}
+  .cland-copy{max-width:38rem;opacity:0;transform:translateY(24px);transition:opacity 1s ease,transform 1s ease}
+  .cland-copy.show{opacity:1;transform:translateY(0)}
+  .cland-copy .school{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--fog);opacity:.75;margin-bottom:.4rem;text-transform:uppercase}
+  .cland-copy .role{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:1px;color:var(--amber);margin-bottom:1.2rem;text-transform:uppercase}
+  .cland-copy h3{font-family:'Spectral',serif;font-weight:500;font-size:clamp(1.9rem,3.2vw,2.9rem);line-height:1.08;color:var(--parchment);margin-bottom:1.6rem;text-shadow:0 2px 30px rgba(0,0,0,.85)}
+  .cland-copy p{font-size:16.5px;line-height:1.7;color:var(--parchment);opacity:.9}
+  /* map screen headline (centered, over the fortress interior) */
+  .cmapHead{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity 1s ease}
+  .cmapHead.show{opacity:1}
+  /* shade pod copy - identyczny z .transHead::before (brakowalo go: jedyna brama bez przyciemnienia) */
+  .cmapHead::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(72rem,92vw);height:min(28rem,60vh);background:radial-gradient(ellipse 55% 60% at 50% 50%,rgba(20,16,12,.58) 0%,rgba(20,16,12,.38) 45%,transparent 82%);pointer-events:none}
+  #mapVign{position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse 70% 70% at 50% 50%,transparent 30%,rgba(0,0,0,.62) 100%)}
+  .cmapHead .inner{position:relative;max-width:40rem;text-align:center;padding:0 6vw}
+  .cmapHead .eyebrow{margin-bottom:1.5rem}
+  .cmapHead h2{font-family:'Spectral',serif;font-weight:500;font-size:clamp(2.2rem,3.6vw,3.4rem);line-height:1.08;color:var(--parchment);text-shadow:0 2px 34px rgba(0,0,0,.9)}
+  /* gate transition headline (centered, over the archway) */
+  .transHead{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity 1s ease}
+  .transHead.show{opacity:1}
+  .transHead::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(72rem,92vw);height:min(28rem,60vh);background:radial-gradient(ellipse 55% 60% at 50% 50%,rgba(20,16,12,.58) 0%,rgba(20,16,12,.38) 45%,transparent 82%);pointer-events:none}
+  .transHead .inner{position:relative;max-width:40rem;text-align:center;padding:0 6vw}
+  .transHead .eyebrow{margin-bottom:1.5rem;color:#7FB4D4;text-shadow:0 1px 20px rgba(0,0,0,.9)}
+  .transHead h2{font-family:'Spectral',serif;font-weight:500;font-size:clamp(2.1rem,3.4vw,3.2rem);line-height:1.1;color:var(--parchment);text-shadow:0 2px 40px rgba(0,0,0,.95),0 0 90px rgba(0,0,0,.7)}
+  @media (max-width:760px){ .cland-copy{max-width:100%} }
+
+  /* ============ WARSZTAT / THE DRAFTING ROOM ============ */
+  #drafting{position:absolute;inset:0;z-index:53;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #drafting.active{opacity:1;pointer-events:auto}
+  #dThresh{background-image:url("assets/drafting-threshold.webp");z-index:3}
+  #dOutward{background-image:url("assets/drafting-outward.webp");z-index:2;opacity:0}
+  #dInward{background-image:url("assets/drafting-inward.webp");z-index:1;opacity:0}
+  #draftVign{position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse 82% 82% at 50% 46%,transparent 40%,rgba(0,0,0,.52) 100%)}
+  /* threshold copy overlay (reuse transHead look) */
+  .draftThreshHead{z-index:8}
+  /* Warsztat i Career maja JASNE centrum kadru (pergaminy / mapa w swietle lampy):
+     wspolny shade .58 daje tam ~10-18% pikseli >140 pod tekstem, wiec te dwie bramy
+     dostaja mocniejszy wariant. Pozostale (Kuznia, Atelier, Sala Planow) zostaja na .58. */
+  .draftThreshHead::before,.cmapHead.cmapStrong::before{
+    background:radial-gradient(ellipse 55% 60% at 50% 50%,rgba(20,16,12,.8) 0%,rgba(20,16,12,.6) 45%,transparent 84%)}
+  .draftThreshHead .eyebrow{color:#7FB4D4;text-shadow:0 1px 20px rgba(0,0,0,.9)}
+  /* prawy shade dla ekranow 1/2 (copy po prawej) */
+  .dshadeR{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(270deg,rgba(35,37,42,.95) 0%,rgba(35,37,42,.82) 30%,rgba(35,37,42,.28) 56%,rgba(35,37,42,0) 74%)}
+  /* lewy shade dla ekranu 2 (copy po lewej) */
+  .dshadeL{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(90deg,rgba(35,37,42,.95) 0%,rgba(35,37,42,.82) 30%,rgba(35,37,42,.28) 56%,rgba(35,37,42,0) 74%)}
+  /* copy wrapy - pionowo wysrodkowane */
+  .dwrapR{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:flex-end;padding:5vh 6vw;pointer-events:none}
+  .dwrapL{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:flex-start;padding:5vh 6vw;pointer-events:none}
+  .draft-copy{max-width:33rem;max-height:88vh;overflow:hidden;opacity:0;transform:translateY(24px);transition:opacity 1s ease,transform 1s ease}
+  .draft-copy.show{opacity:1;transform:translateY(0)}
+  .draft-copy .dhead{margin-bottom:1.7rem}
+  .draft-copy .eyebrow{margin-bottom:1rem}
+  .draft-copy h3{font-family:'Spectral',serif;font-weight:500;font-size:clamp(1.7rem,2.9vw,2.5rem);line-height:1.1;color:var(--parchment);margin-bottom:.9rem;text-shadow:0 2px 30px rgba(0,0,0,.85)}
+  .draft-copy .dlede{font-size:15px;line-height:1.55;color:var(--parchment);opacity:.72;font-style:italic;font-family:'Spectral',serif}
+  /* pojedynczy schemat */
+  .schem{position:relative;padding-left:2.9rem}
+  .schem .srune{position:absolute;left:0;top:.15rem;width:18px;height:22px;color:var(--runic);opacity:.85}
+  .schem .srune svg{display:block;width:100%;height:100%}
+  .schem .scat{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:2px;color:var(--amber);text-transform:uppercase;margin-bottom:.3rem}
+  .schem .sname{font-family:'Spectral',serif;font-weight:500;font-size:1.2rem;color:var(--parchment);margin-bottom:.5rem}
+  .schem p{font-size:14px;line-height:1.6;color:var(--parchment);opacity:.85}
+  /* divider gradientowy - zarzacy sie drut */
+  .sdiv{height:1px;margin:1.35rem 0;background:linear-gradient(90deg,transparent 0%,rgba(142,105,69,.25) 18%,var(--amber) 50%,rgba(142,105,69,.25) 82%,transparent 100%);opacity:.65}
+  @media (max-width:760px){ .draft-copy{max-width:100%} .schem p{font-size:13.5px} }
+
+  /* ============ KUŹNIA / THE FORGE ============ */
+  #forge{position:absolute;inset:0;z-index:54;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #forge.active{opacity:1;pointer-events:auto}
+  #fCorridor{background-image:url("assets/forge-corridor.webp");z-index:7}
+  #fMsi{background-image:url("assets/forge-msi.webp");z-index:6;opacity:0}
+  #fRadar{background-image:url("assets/forge-radar.webp");z-index:5;opacity:0}
+  #fArchicom{background-image:url("assets/forge-archicom.webp");z-index:4;opacity:0}
+  #fStudent{background-image:url("assets/forge-student.webp");z-index:3;opacity:0}
+  #fMvp{background-image:url("assets/forge-mvp.webp");z-index:2;opacity:0}
+  #fCoral{background-image:url("assets/forge-coral.webp");z-index:1;opacity:0}
+  #forgeVign{position:absolute;inset:0;z-index:8;pointer-events:none;background:radial-gradient(ellipse 82% 82% at 50% 46%,transparent 38%,rgba(0,0,0,.55) 100%)}
+  .forgeThreshHead{z-index:12}
+  /* shades */
+  .fshadeR{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(270deg,rgba(30,26,24,.95) 0%,rgba(30,26,24,.82) 30%,rgba(30,26,24,.28) 56%,rgba(30,26,24,0) 74%)}
+  .fshadeL{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(90deg,rgba(30,26,24,.95) 0%,rgba(30,26,24,.82) 30%,rgba(30,26,24,.28) 56%,rgba(30,26,24,0) 74%)}
+  /* wrapy */
+  .fwrapR{position:absolute;inset:0;z-index:11;display:flex;align-items:center;justify-content:flex-end;padding:5vh 6vw;pointer-events:none}
+  .fwrapL{position:absolute;inset:0;z-index:11;display:flex;align-items:center;justify-content:flex-start;padding:5vh 6vw;pointer-events:none}
+  .fshadeC{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(180deg,rgba(30,26,24,.9) 0%,rgba(30,26,24,.72) 30%,rgba(30,26,24,.72) 70%,rgba(30,26,24,.9) 100%)}
+  .fwrapWide{position:absolute;inset:0;z-index:11;display:flex;align-items:center;justify-content:center;padding:4vh 5vw;pointer-events:none}
+
+  /* ========== ATELIER (Lokacja 6) ========== */
+  #atelier{position:absolute;inset:0;z-index:56;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #atelier.active{opacity:1;pointer-events:auto}
+  /* z-index maleje wg narracji (wzorzec 10.5): odslanianie, nie mieszanie */
+  #aThresh{background-image:url("assets/atelier-threshold.webp");z-index:7;opacity:1}
+  #aHomer{background-image:url("assets/atelier-homer.webp");z-index:6;opacity:0}
+  #aSatori{background-image:url("assets/atelier-satori.webp");z-index:5;opacity:0}
+  #aWonder{background-image:url("assets/atelier-wonderyear.webp");z-index:4;opacity:0}
+  #aHearth{background-image:url("assets/atelier-hearth.webp");z-index:3;opacity:0}
+  #aQuad{background-image:url("assets/atelier-quad.webp");z-index:2;opacity:0}
+  #aIsolario{background-image:url("assets/atelier-isolario.webp");z-index:1;opacity:0}
+  #atelierVign{position:absolute;inset:0;z-index:8;pointer-events:none;
+    background:radial-gradient(ellipse 88% 88% at 50% 48%,transparent 42%,rgba(0,0,0,.5) 100%)}
+  .atelierThreshHead{z-index:12}
+  /* shade LEKKI - pomiar 12.13 mowi, ze pasy boczne sa juz ciemne (max<=78),
+     wiec to tylko separacja tekstu od witraza, nie ratunek dla kontrastu */
+  .ashadeR{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(270deg,rgba(18,16,15,.82) 0%,rgba(18,16,15,.6) 24%,rgba(18,16,15,.12) 46%,rgba(18,16,15,0) 62%)}
+  .ashadeL{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(90deg,rgba(18,16,15,.82) 0%,rgba(18,16,15,.6) 24%,rgba(18,16,15,.12) 46%,rgba(18,16,15,0) 62%)}
+  /* wrapy - stos pionowy w bezpiecznym pasie 26% */
+  .awrapR{position:absolute;inset:0;z-index:11;display:flex;align-items:center;justify-content:flex-end;padding:5vh 4vw;pointer-events:none}
+  .awrapL{position:absolute;inset:0;z-index:11;display:flex;align-items:center;justify-content:flex-start;padding:5vh 4vw;pointer-events:none}
+  .atelier-copy{max-width:23rem;opacity:0;transform:translateY(24px);transition:opacity 1s ease,transform 1s ease;pointer-events:none}
+  .atelier-copy.show{opacity:1;transform:translateY(0);pointer-events:auto}
+  .atelier-copy .eyebrow{margin-bottom:.85rem}
+  .atelier-copy h3{font-family:'Spectral',serif;font-weight:500;font-size:clamp(1.5rem,2.4vw,2.05rem);line-height:1.14;
+    color:var(--parchment);margin-bottom:.9rem;text-shadow:0 2px 30px rgba(0,0,0,.85)}
+  .atelier-copy p{font-size:14.5px;line-height:1.6;color:var(--parchment);opacity:.85;margin-bottom:.75rem}
+  /* stopka techniczna - mono, przygaszona */
+  .atelier-copy .atech{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.8px;
+    text-transform:uppercase;color:var(--parchment);opacity:.42;margin:1.15rem 0 1.35rem;line-height:1.7}
+  /* linki: STOS PIONOWY - przycisk, pod nim szept */
+  .alinks{display:flex;flex-direction:column;align-items:flex-start;gap:.65rem}
+  .alink{display:inline-flex;align-items:center;gap:.5rem;font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--parchment);text-decoration:none;
+    border:1px solid rgba(199,143,74,.5);padding:.7rem 1.15rem;border-radius:2px;
+    transition:border-color .35s ease,background .35s ease,color .35s ease}
+  .alink:hover,.alink:focus-visible{border-color:var(--amber);background:rgba(199,143,74,.1);color:var(--amber)}
+  .asrc{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.6px;text-transform:lowercase;
+    color:var(--parchment);opacity:.45;text-decoration:none;border-bottom:1px solid rgba(232,228,220,.22);
+    padding-bottom:1px;transition:opacity .35s ease,color .35s ease,border-color .35s ease}
+  .asrc:hover,.asrc:focus-visible{opacity:.9;color:var(--amber);border-color:rgba(199,143,74,.6)}
+  @media (max-width:900px){ .atelier-copy{max-width:20rem} }
+
+  /* ========== SALA PLANOW (Lokacja 7) ========== */
+  #planning{position:absolute;inset:0;z-index:58;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #planning.active{opacity:1;pointer-events:auto}
+  #pThresh{background-image:url("assets/planning-threshold.webp");z-index:3;opacity:1}
+  #pRadar{background-image:url("assets/planning-radar.webp");z-index:2;opacity:0}
+  #pCozy{background-image:url("assets/planning-cozystay.webp");z-index:1;opacity:0}
+  #planningVign{position:absolute;inset:0;z-index:8;pointer-events:none;
+    background:radial-gradient(ellipse 86% 86% at 50% 47%,transparent 40%,rgba(0,0,0,.52) 100%)}
+  .planningThreshHead{z-index:12}
+  .pshadeR{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(270deg,rgba(22,19,17,.9) 0%,rgba(22,19,17,.72) 28%,rgba(22,19,17,.2) 50%,rgba(22,19,17,0) 66%)}
+  .pshadeL{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(90deg,rgba(22,19,17,.9) 0%,rgba(22,19,17,.72) 28%,rgba(22,19,17,.2) 50%,rgba(22,19,17,0) 66%)}
+  .pwrapR{position:absolute;inset:0;z-index:11;display:flex;align-items:center;justify-content:flex-end;padding:5vh 5vw;pointer-events:none}
+  .pwrapL{position:absolute;inset:0;z-index:11;display:flex;align-items:center;justify-content:flex-start;padding:5vh 5vw;pointer-events:none}
+  .planning-copy{max-width:26rem;opacity:0;transform:translateY(24px);transition:opacity 1s ease,transform 1s ease}
+  .planning-copy.show{opacity:1;transform:translateY(0)}
+  .planning-copy .eyebrow{margin-bottom:.9rem}
+  /* status - znacznik warsztatu, nie "coming soon" */
+  .pstatus{display:inline-flex;align-items:center;gap:.55rem;font-family:'JetBrains Mono',monospace;
+    font-size:9.5px;letter-spacing:2.4px;text-transform:uppercase;color:var(--amber);opacity:.9;margin-bottom:1.1rem}
+  .pstatus::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--amber);opacity:.85}
+  .planning-copy h3{font-family:'Spectral',serif;font-weight:500;font-size:clamp(1.5rem,2.5vw,2.1rem);line-height:1.14;
+    color:var(--parchment);margin-bottom:1rem;text-shadow:0 2px 30px rgba(0,0,0,.85)}
+  .planning-copy p{font-size:14.5px;line-height:1.62;color:var(--parchment);opacity:.85;margin-bottom:.9rem}
+  /* linia z liczbami - dowod dyscypliny, wyrozniona */
+  .pcount{font-family:'Spectral',serif;font-style:italic;font-size:15px;color:var(--parchment);
+    opacity:.95;border-left:2px solid var(--amber);padding-left:1rem;margin:1.15rem 0 0}
+  .planning-copy .atech{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.8px;
+    text-transform:uppercase;color:var(--parchment);opacity:.42;margin-top:1.35rem;line-height:1.7}
+  @media (max-width:900px){ .planning-copy{max-width:22rem} }
+  @media (max-width:760px){
+    .pwrapR,.pwrapL{align-items:flex-end;justify-content:center;padding:4vh 7vw 9vh}
+    .planning-copy{max-width:100%}
+    .planning-copy h3{font-size:1.4rem}
+    .planning-copy p{font-size:13.5px}
+    .pshadeR,.pshadeL{background:linear-gradient(0deg,rgba(22,19,17,.94) 0%,rgba(22,19,17,.76) 36%,rgba(22,19,17,0) 64%)}
+  }
+
+  /* ========== BIBLIOTEKA (Lokacja 8) ========== */
+  #library{position:absolute;inset:0;z-index:59;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #library.active{opacity:1;pointer-events:auto}
+  #lThresh{background-image:url("assets/library-threshold.webp");z-index:3;opacity:1}
+  #lDesk{background-image:url("assets/library-desk.webp");z-index:2;opacity:0}
+  #lScen{background-image:url("assets/library-scenarios.webp");z-index:1;opacity:0}
+  #libraryVign{position:absolute;inset:0;z-index:8;pointer-events:none;
+    background:radial-gradient(ellipse 86% 86% at 50% 47%,transparent 40%,rgba(0,0,0,.52) 100%)}
+  .libraryThreshHead{z-index:12}
+  /* shade slabszy niz w Sali Planow - pomiar dal 13.9:1 (lewa) i 11.5:1 (prawa), duzy zapas */
+  .lshadeL{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(90deg,rgba(22,19,17,.78) 0%,rgba(22,19,17,.58) 28%,rgba(22,19,17,.16) 50%,rgba(22,19,17,0) 66%)}
+  .lshadeR{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .8s ease;
+    background:linear-gradient(270deg,rgba(22,19,17,.78) 0%,rgba(22,19,17,.58) 28%,rgba(22,19,17,.16) 50%,rgba(22,19,17,0) 66%)}
+  .lwrapL{position:absolute;inset:0;z-index:11;display:flex;align-items:center;justify-content:flex-start;padding:5vh 5vw;pointer-events:none}
+  .lwrapR{position:absolute;inset:0;z-index:11;display:flex;align-items:center;justify-content:flex-end;padding:5vh 5vw;pointer-events:none}
+  .library-copy{max-width:26rem;opacity:0;transform:translateY(24px);transition:opacity 1s ease,transform 1s ease}
+  .library-copy.show{opacity:1;transform:translateY(0);pointer-events:auto}
+  .library-copy .eyebrow{margin-bottom:.9rem}
+  .lstatus{display:inline-flex;align-items:center;gap:.55rem;font-family:'JetBrains Mono',monospace;
+    font-size:9.5px;letter-spacing:2.4px;text-transform:uppercase;color:var(--amber);opacity:.9;margin-bottom:1.1rem}
+  .lstatus::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--amber);opacity:.85}
+  .library-copy h3{font-family:'Spectral',serif;font-weight:500;font-size:clamp(1.5rem,2.5vw,2.1rem);line-height:1.14;
+    color:var(--parchment);margin-bottom:1rem;text-shadow:0 2px 30px rgba(0,0,0,.85)}
+  .library-copy p{font-size:14.5px;line-height:1.62;color:var(--parchment);opacity:.85;margin-bottom:.9rem}
+  .lcount{font-family:'Spectral',serif;font-style:italic;font-size:15px;color:var(--parchment);
+    opacity:.95;border-left:2px solid var(--amber);padding-left:1rem;margin:1.15rem 0 0}
+  .ldetail{font-size:13.5px;line-height:1.6;color:var(--parchment);opacity:.62;margin-top:1.1rem}
+  .library-copy .atech{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.8px;
+    text-transform:uppercase;color:var(--parchment);opacity:.42;margin-top:1.35rem;line-height:1.7}
+  /* dwie czesci kursu sa ROWNORZEDNE - obie jako .alink, w rzedzie (nie .asrc, ktory jest przypisem) */
+  .llinks{flex-direction:row;flex-wrap:wrap;gap:.6rem;margin-top:1.35rem}
+  @media (max-width:900px){ .library-copy{max-width:22rem} }
+  @media (max-width:760px){
+    .lwrapL,.lwrapR{align-items:flex-end;justify-content:center;padding:4vh 7vw 9vh}
+    .library-copy{max-width:100%}
+    .library-copy h3{font-size:1.4rem}
+    .library-copy p{font-size:13.5px}
+    .lshadeL,.lshadeR{background:linear-gradient(0deg,rgba(22,19,17,.92) 0%,rgba(22,19,17,.72) 36%,rgba(22,19,17,0) 64%)}
+    .llinks{flex-direction:column}
+  }
+
+  /* ========== PALENISKO (Lokacja 9) ========== */
+  #hearth{position:absolute;inset:0;z-index:60;overflow:hidden;background:#000;opacity:0;pointer-events:none;transition:opacity 1s ease}
+  #hearth.active{opacity:1;pointer-events:auto}
+  #hRoom{background-image:url("assets/hearth-room.webp");z-index:2;opacity:1}
+  #hearthVign{position:absolute;inset:0;z-index:8;pointer-events:none;
+    background:radial-gradient(ellipse 88% 88% at 50% 50%,transparent 38%,rgba(0,0,0,.5) 100%)}
+  .hshade{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity 1.1s ease;
+    background:radial-gradient(ellipse 62% 74% at 50% 54%,rgba(18,15,13,.86) 0%,rgba(18,15,13,.7) 45%,rgba(18,15,13,.28) 74%,rgba(18,15,13,0) 100%)}
+  .hwrap{position:absolute;inset:0;z-index:11;display:flex;align-items:center;justify-content:center;padding:5vh 5vw;pointer-events:none;overflow-y:auto}
+  .hearth-copy{max-width:34rem;width:100%;text-align:center;opacity:0;transform:translateY(24px);
+    transition:opacity 1.1s ease,transform 1.1s ease}
+  .hearth-copy.show{opacity:1;transform:translateY(0);pointer-events:auto}
+  .hearth-copy .eyebrow{margin-bottom:1.1rem}
+  .hearth-copy h2{font-family:'Spectral',serif;font-weight:500;font-size:clamp(1.7rem,3.2vw,2.6rem);line-height:1.12;
+    color:var(--parchment);margin-bottom:1.1rem;text-shadow:0 2px 34px rgba(0,0,0,.9)}
+  .hearth-copy .hsub{font-size:14.5px;line-height:1.65;color:var(--parchment);opacity:.85;margin:0 auto 2.1rem;max-width:30rem}
+
+  /* formularz */
+  .hform{display:flex;flex-direction:column;gap:.85rem;text-align:left;margin:0 auto;max-width:30rem}
+  .hrow{display:flex;gap:.85rem}
+  .hrow > *{flex:1}
+  .hfield label{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:2.2px;
+    text-transform:uppercase;color:var(--parchment);opacity:.5;margin-bottom:.4rem}
+  .hfield input,.hfield textarea{width:100%;font-family:'Archivo',sans-serif;font-size:14px;color:var(--parchment);
+    background:rgba(24,21,19,.62);border:1px solid rgba(221,210,191,.22);border-radius:2px;padding:.7rem .85rem;
+    transition:border-color .3s ease,background .3s ease}
+  .hfield textarea{resize:vertical;min-height:5.5rem;line-height:1.55}
+  .hfield input:focus,.hfield textarea:focus{outline:none;border-color:var(--amber);background:rgba(24,21,19,.8)}
+  .hfield input::placeholder,.hfield textarea::placeholder{color:var(--parchment);opacity:.3}
+  .hfield.err input,.hfield.err textarea{border-color:#B4573C}
+  .herr{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.4px;color:#D08163;margin-top:.3rem;display:none}
+  .hfield.err .herr{display:block}
+  /* honeypot - niewidoczny dla ludzi, wypelniany przez boty */
+  .hpot{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none}
+  .hsend{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.2px;text-transform:uppercase;
+    color:var(--parchment);background:rgba(199,143,74,.14);border:1px solid rgba(199,143,74,.5);border-radius:2px;
+    padding:.85rem 1.4rem;margin-top:.5rem;cursor:pointer;transition:background .3s ease,border-color .3s ease,color .3s ease}
+  .hsend:hover:not(:disabled),.hsend:focus-visible{background:rgba(199,143,74,.26);border-color:var(--amber);color:var(--fire)}
+  .hsend:disabled{opacity:.5;cursor:default}
+  .hnote{font-size:12.5px;line-height:1.6;color:var(--parchment);opacity:.55;margin-top:1.2rem}
+  .hfail{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:1.2px;color:#D08163;
+    margin-top:.9rem;min-height:1.1rem}
+  .hlinks{display:flex;gap:1.4rem;justify-content:center;margin-top:1.6rem}
+  .hlink{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:2px;text-transform:uppercase;
+    color:var(--parchment);opacity:.62;text-decoration:none;border-bottom:1px solid rgba(221,210,191,.24);
+    padding-bottom:2px;transition:opacity .3s ease,color .3s ease,border-color .3s ease}
+  .hlink:hover,.hlink:focus-visible{opacity:1;color:var(--amber);border-color:rgba(199,143,74,.6)}
+
+  /* ekran-nagroda: swit. ULOTNY - bez localStorage, znika po odswiezeniu */
+  #dawn{position:absolute;inset:0;z-index:70;background:#000;opacity:0;pointer-events:none;
+    transition:opacity 1.6s ease;overflow:hidden}
+  #dawn.show{opacity:1;pointer-events:auto}
+  #dawnBg{position:absolute;inset:0;background-image:url("assets/hearth-dawn.webp");
+    background-size:cover;background-position:center;transform:scale(1.06);
+    transition:transform 6s cubic-bezier(.2,.6,.2,1)}
+  #dawn.show #dawnBg{transform:scale(1)}
+  #dawnShade{position:absolute;inset:0;
+    background:radial-gradient(ellipse 66% 76% at 50% 52%,rgba(16,14,12,.82) 0%,rgba(16,14,12,.62) 48%,rgba(16,14,12,.2) 78%,rgba(16,14,12,0) 100%)}
+  .dwrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:6vh 6vw;overflow-y:auto}
+  .dawn-copy{max-width:33rem;text-align:center;opacity:0;transform:translateY(26px);
+    transition:opacity 1.4s ease .5s,transform 1.4s ease .5s}
+  #dawn.show .dawn-copy{opacity:1;transform:translateY(0)}
+  .dawn-copy .eyebrow{margin-bottom:1.1rem}
+  .dawn-copy h2{font-family:'Spectral',serif;font-weight:500;font-size:clamp(1.6rem,3vw,2.4rem);line-height:1.14;
+    color:var(--parchment);margin-bottom:1.3rem;text-shadow:0 2px 34px rgba(0,0,0,.9)}
+  .dawn-copy p{font-size:14.5px;line-height:1.68;color:var(--parchment);opacity:.85;margin-bottom:1rem}
+  .dclose{font-family:'Spectral',serif;font-style:italic;font-size:17px;color:var(--fire);opacity:.92;margin-top:1.8rem}
+  @media (max-width:760px){
+    .hwrap{align-items:flex-start;padding:7vh 7vw 10vh}
+    .hearth-copy h2{font-size:1.5rem}
+    .hrow{flex-direction:column;gap:.85rem}
+    .hshade{background:linear-gradient(0deg,rgba(18,15,13,.94) 0%,rgba(18,15,13,.82) 50%,rgba(18,15,13,.45) 100%)}
+    .dawn-copy h2{font-size:1.4rem}
+  }
+  @media (max-width:760px){
+    .awrapR,.awrapL{align-items:flex-end;justify-content:center;padding:4vh 7vw 9vh}
+    .atelier-copy{max-width:100%}
+    .atelier-copy h3{font-size:1.4rem}
+    .atelier-copy p{font-size:13.5px}
+    .ashadeR,.ashadeL{background:linear-gradient(0deg,rgba(18,16,15,.92) 0%,rgba(18,16,15,.72) 34%,rgba(18,16,15,0) 62%)}
+  }
+  .forge-copy{max-width:32rem;max-height:88vh;overflow:hidden;opacity:0;transform:translateY(24px);transition:opacity 1s ease,transform 1s ease}
+  .forge-copy.show{opacity:1;transform:translateY(0)}
+  /* ARCHICOM: szeroki panel - naglowek u gory (najciemniejszy pas kadru), dwie rowne kolumny nad stolami */
+  .forge-copy.fwide{max-width:min(64rem,90vw);text-align:left}
+  .fwide .fhead3{text-align:center;max-width:44rem;margin:0 auto 1.8rem}
+  .fwide .fhead3 .fseam{text-align:left;display:inline-block}
+  .fcols{display:flex;gap:3.5rem;align-items:flex-start}
+  .fcol{flex:1 1 0;min-width:0}
+  .fwide .fkicker{text-align:center;max-width:42rem;margin-left:auto;margin-right:auto}
+  .forge-copy .eyebrow{margin-bottom:1rem}
+  .forge-copy h3{font-family:'Spectral',serif;font-weight:500;font-size:clamp(1.6rem,2.7vw,2.35rem);line-height:1.12;color:var(--parchment);margin-bottom:1.1rem;text-shadow:0 2px 30px rgba(0,0,0,.85)}
+  .forge-copy p{font-size:14.5px;line-height:1.62;color:var(--parchment);opacity:.85;margin-bottom:.95rem}
+  .forge-copy p:last-child{margin-bottom:0}
+  /* podnaglowek stanowiska (Tenders / Sales / Job board...) */
+  .forge-copy .fsub{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:2px;color:var(--amber);text-transform:uppercase;margin:1.15rem 0 .45rem}
+  /* akcent zyly rudy - Webcon */
+  .forge-copy .fseam{border-left:2px solid var(--amber);padding-left:1rem;opacity:.95}
+  .forge-copy .fseamInline{color:var(--amber);opacity:.95}
+  /* zdanie-puenta */
+  .forge-copy .fkicker{font-family:'Spectral',serif;font-style:italic;font-size:15px;opacity:.95;color:var(--parchment);margin-top:1.15rem}
+  @media (max-width:900px){
+    .fcols{flex-direction:column;gap:1.4rem}
+    .forge-copy.fwide{max-width:100%}
+    .fwide .fhead3{text-align:left}
+  }
+  @media (max-width:760px){ .forge-copy{max-width:100%} .forge-copy p{font-size:13.5px} }
+
+  /* progress indicator: stylizowana nazwa sekcji + kropki pod spodem */
+  .progress{position:fixed;bottom:4vh;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;align-items:center;gap:7px;opacity:0;transition:opacity .6s ease;pointer-events:none}
+  .progress.show{opacity:1}
+  .progLabel{font-family:'Spectral',serif;font-weight:500;font-size:13px;letter-spacing:4px;text-transform:uppercase;
+    color:var(--parchment);opacity:.9;white-space:nowrap;text-shadow:0 2px 18px rgba(0,0,0,.85);
+    display:flex;align-items:center;gap:12px}
+  /* delikatne kreski po bokach nazwy - "tabliczka" */
+  .progLabel::before,.progLabel::after{content:"";width:22px;height:1px;background:linear-gradient(90deg,transparent,var(--bronze),transparent);opacity:.7}
+  /* podpis dosłowny pod nazwą - nawigacyjny, ma nie konkurowac z nazwa */
+  .progSub{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2.6px;text-transform:uppercase;
+    color:var(--parchment);opacity:.42;white-space:nowrap;text-shadow:0 1px 12px rgba(0,0,0,.9);margin-top:-2px}
+  .progDots{display:flex;gap:8px;margin-top:3px}
+  .progDots .dot{width:6px;height:6px;border-radius:50%;background:var(--fog);opacity:.25;transition:opacity .4s,background .4s}
+  .progDots .dot.on{opacity:.9;background:var(--fire)}
+
+  @media (max-width:760px){ .copyHall{max-width:100%} .cols{grid-template-columns:1fr;gap:2vh;max-width:100%} .cloiHead{margin-bottom:2vh} }
+
+  /* ===== CHROME GORNY: MENU w prawym gornym rogu (zawsze, od wyjscia z Hero) ===== */
+  .chromeTop{position:fixed;top:3vh;right:3vw;z-index:320;display:flex;align-items:center}
+
+  /* ===== PRZYCISK MENU (widoczny domyslnie, nie wymaga ukonczenia trasy) ===== */
+  .navBtn{width:34px;height:26px;background:none;border:none;
+    cursor:pointer;opacity:0;pointer-events:none;transition:opacity .5s ease;padding:0}
+  .navBtn.show{opacity:.45;pointer-events:auto}
+  .navBtn.show:hover{opacity:.95}
+  .navBtn span{display:block;height:1.4px;background:var(--parchment);margin:6px 0;border-radius:1px;
+    box-shadow:0 1px 10px rgba(0,0,0,.9);transition:transform .35s ease,opacity .35s ease}
+  .navBtn span:nth-child(2){width:70%}
+  .navBtn.open span:nth-child(1){transform:translateY(7.4px) rotate(45deg)}
+  .navBtn.open span:nth-child(2){opacity:0}
+  .navBtn.open span:nth-child(3){transform:translateY(-7.4px) rotate(-45deg)}
+
+  /* ===== PANEL MENU ===== */
+  .navPanel{position:fixed;inset:0;z-index:310;background:rgba(9,10,12,.93);backdrop-filter:blur(7px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+    opacity:0;pointer-events:none;transition:opacity .45s ease}
+  .navPanel.open{opacity:1;pointer-events:auto}
+  .navPanel .navTitle{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:3.4px;
+    text-transform:uppercase;color:var(--fog);opacity:.5;margin-bottom:3.4vh}
+  .navItem{display:flex;align-items:baseline;gap:16px;background:none;border:none;cursor:pointer;
+    padding:.85vh 0;font-family:'Spectral',serif;color:var(--parchment);opacity:.62;
+    transition:opacity .28s ease,transform .28s ease;text-align:left}
+  .navItem:hover{opacity:1;transform:translateX(5px)}
+  .navItem .navNum{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.6px;
+    color:var(--bronze);opacity:.75;min-width:26px}
+  .navItem .navName{font-size:19px;letter-spacing:2.6px;text-transform:uppercase;font-weight:500}
+  .navItem.here{opacity:1}
+  .navItem.here .navName{color:var(--fire)}
+  .navItem.here .navNum{color:var(--fire);opacity:.9}
+  @media (max-width:760px){ .navItem .navName{font-size:15px;letter-spacing:1.8px} .navItem{padding:.7vh 0} }
+
+  /* ===== SLUZA (ekran przejsciowy przy skoku z menu) ===== */
+  #airlock{position:fixed;inset:0;z-index:340;opacity:0;pointer-events:none;transition:opacity .42s ease;background:#07080a}
+  #airlock.on{opacity:1;pointer-events:auto}
+  #airlock .albg{position:absolute;inset:0;background:url("assets/stairwell.webp") center/cover no-repeat;
+    transform:scale(1.06);transition:transform 2.6s cubic-bezier(.22,.61,.36,1)}
+  #airlock.on .albg{transform:scale(1.0)}
+  /* copy siedzi w dolnej strefie (zmierzone: od 79% w dol p95<32) - radial shade jak w Palenisku */
+  #airlock .alshade{position:absolute;inset:0;background:radial-gradient(ellipse 70% 42% at 50% 88%,rgba(6,7,9,.9) 0%,rgba(6,7,9,.62) 45%,rgba(6,7,9,0) 78%)}
+  #airlock .alwrap{position:absolute;left:0;right:0;bottom:11vh;display:flex;flex-direction:column;
+    align-items:center;gap:10px;text-align:center;padding:0 6vw}
+  #airlock .alnum{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:3.4px;
+    text-transform:uppercase;color:var(--bronze);opacity:0;transform:translateY(8px);
+    transition:opacity .7s ease .18s,transform .7s ease .18s}
+  #airlock .alname{font-family:'Spectral',serif;font-weight:500;font-size:clamp(20px,3vw,30px);
+    letter-spacing:6px;text-transform:uppercase;color:var(--parchment);opacity:0;transform:translateY(10px);
+    text-shadow:0 2px 22px rgba(0,0,0,.9);transition:opacity .8s ease .3s,transform .8s ease .3s}
+  #airlock .alsub{font-family:'Spectral',serif;font-style:italic;font-size:13px;letter-spacing:.4px;
+    color:var(--fog);opacity:0;transform:translateY(8px);max-width:34ch;
+    transition:opacity .8s ease .52s,transform .8s ease .52s}
+  #airlock.on .alnum,#airlock.on .alname,#airlock.on .alsub{opacity:1;transform:translateY(0)}
+  #airlock.on .alsub{opacity:.62}
+  #airlock.brief .alsub{opacity:0 !important;transition-delay:0s}
+  #airlock.brief .alnum,#airlock.brief .alname{transition-delay:.06s,.12s}
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- ===== ABOUT (pod hero) ===== -->
+  <div id="about">
+    <div class="bgimg" id="cloi"></div>
+    <div class="bgimg" id="hall"></div>
+    <div class="bgimg" id="trans"></div>
+    <div id="transVign"></div>
+    <div class="transHead" id="transHead">
+      <div class="inner">
+        <div class="eyebrow">The Threshold</div>
+        <h2>Who works the stone below?</h2>
+      </div>
+    </div>
+    <canvas id="atmoAbout"></canvas>
+    <div id="shadeHall"></div>
+    <div id="shadeCloi"></div>
+    <div class="wrapHall">
+      <div class="copyHall" id="copyHall">
+        <div class="eyebrow">The Great Hall</div>
+        <h2>Every craft leaves a record of the hands that shaped it.</h2>
+        <div class="body">
+          <p>I built my first website almost fifteen years ago, and curiosity has shaped every step since. What began with front-end development gradually led me toward no-code platforms, business automation and product-focused application development.</p>
+          <p>Today I combine Bubble, automation and modern AI-assisted workflows to turn complex ideas into practical digital products. I enjoy understanding how a process works, finding where it can be improved, and building a solution that people can use without friction.</p>
+        </div>
+        <div class="maker-note">Learned at other forges before lighting my own.</div>
+      </div>
+    </div>
+    <div class="wrapCloi" id="wrapCloi">
+      <div class="cloiHead">Every master was first an apprentice.</div>
+      <div class="cols">
+        <div class="col">
+          <div class="school">Kodilla</div><div class="field">Front-end development</div>
+          <div class="ctitle">The Foundations</div>
+          <div class="cdesc">Where it started - building the web by hand, learning how structure becomes something people can use. HTML, CSS, JavaScript and React - the craft of turning designs into working interfaces.</div>
+        </div>
+        <div class="col">
+          <div class="school">eduweb</div><div class="field">No-code platforms</div>
+          <div class="ctitle">The Shift</div>
+          <div class="cdesc">The turning point - discovering that complex products could be built without writing everything from scratch. Airtable, Webflow and automation tools opened a faster way to ship real solutions.</div>
+        </div>
+        <div class="col">
+          <div class="school">ProNoCoders</div><div class="field">Bubble &amp; backend</div>
+          <div class="ctitle">The Depth</div>
+          <div class="cdesc">Going deeper - full application logic, data and backend, where ideas become working systems. Building complete web apps with databases, workflows and integrations.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CAREER (Three Roads) ===== -->
+  <div id="career">
+    <div class="bgimg" id="cland3"></div>
+    <div class="bgimg" id="cland2"></div>
+    <div class="bgimg" id="cland1"></div>
+    <div class="bgimg" id="cmap"></div>
+    <div id="mapVign"></div>
+    <div id="careerVign"></div>
+    <canvas id="atmoCareer"></canvas>
+    <div class="cshadeL" id="cshadeL"></div>
+    <div class="cshadeR" id="cshadeR"></div>
+
+    <div class="cmapHead cmapStrong" id="cmapHead">
+      <div class="inner">
+        <div class="eyebrow">The Cartographer's Table</div>
+        <h2>Three roads led here.</h2>
+      </div>
+    </div>
+
+    <!-- Eduweb - copy LEFT -->
+    <div class="cwrapL" id="cwrap1">
+      <div class="cland-copy" id="ccopy1">
+        <div class="school">Eduweb</div>
+        <div class="role">No-code Developer &amp; Automation Specialist</div>
+        <h3>Where the mechanisms came to life.</h3>
+        <p>Building automations that ran on their own, and learning to carry a project from first conversation to final delivery. Hundreds of scenarios for real business clients, across marketing, digital sales, online courses and communities. This was where independence was forged - owning the whole process, not just a piece of it.</p>
+      </div>
+    </div>
+
+    <!-- BPMRIDERS - copy RIGHT -->
+    <div class="cwrapR" id="cwrap2">
+      <div class="cland-copy" id="ccopy2">
+        <div class="school">BPMRIDERS</div>
+        <div class="role">Bubble Developer</div>
+        <h3>The bridge between two worlds.</h3>
+        <p>Connecting raw back-end systems to interfaces people could actually use. Built for one of Poland's largest developers, powering both their tender and sales teams, with a separate portal for student housing. Present at every stage, from first estimate and client talks to the shipped product.</p>
+      </div>
+    </div>
+
+    <!-- ProNoCoders - copy LEFT -->
+    <div class="cwrapL" id="cwrap3">
+      <div class="cland-copy" id="ccopy3">
+        <div class="school">ProNoCoders</div>
+        <div class="role">Bubble / App Developer</div>
+        <h3>Joining a crew already in motion.</h3>
+        <p>Taking over a live product, testing, shipping features and working shoulder to shoulder with the client. A rhythm of QA, releases and daily standups alongside other developers. Learning to keep something running while steadily making it better.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== WARSZTAT / THE DRAFTING ROOM (Lokacja 4) ===== -->
+  <div id="drafting">
+    <div class="bgimg" id="dInward"></div>
+    <div class="bgimg" id="dOutward"></div>
+    <div class="bgimg" id="dThresh"></div>
+    <div id="draftVign"></div>
+
+    <!-- ekran przejsciowy: copy overlay jak brama Hero->About -->
+    <div class="transHead draftThreshHead" id="dThreshHead">
+      <div class="inner" style="margin-left:auto;margin-right:auto;text-align:center">
+        <div class="eyebrow">The Drafting Room</div>
+        <h2>Before a thing is forged, it is drawn.</h2>
+      </div>
+    </div>
+
+    <!-- copy shades -->
+    <div class="dshadeR" id="dshadeR"></div>
+    <div class="dshadeL" id="dshadeL"></div>
+
+    <!-- EKRAN 1 (zewnetrzne) - copy PRAWA, 3 schematy -->
+    <div class="dwrapR" id="dwrap1">
+      <div class="draft-copy" id="dcopy1">
+        <div class="dhead">
+          <div class="eyebrow">Schematics</div>
+          <h3>Schematics that face the world.</h3>
+          <p class="dlede">Plans for the work that meets customers, markets, and messages.</p>
+        </div>
+        <div class="schem">
+          <div class="srune"><svg viewBox="0 0 18 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M9 21 V3"/><path d="M3 9 L9 3 L15 9"/><path d="M9 8 L14 13" opacity=".6"/></svg></div>
+          <div class="scat">Marketing</div>
+          <div class="sname">The Herald's Schematic</div>
+          <p>Publishing content, scheduling social, drafting materials with AI, sending newsletters, reading a campaign's results - drawn as one loop that runs itself.</p>
+        </div>
+        <div class="sdiv"></div>
+        <div class="schem">
+          <div class="srune"><svg viewBox="0 0 18 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M5 1 V21"/><path d="M5 6 L14 3"/><path d="M5 12 L14 9"/><path d="M5 18 L14 15"/></svg></div>
+          <div class="scat">Sales</div>
+          <div class="sname">The Ledger's Schematic</div>
+          <p>Qualifying leads, passing them to the CRM, following up on time, and reporting what closed - a mechanism that never forgets a name.</p>
+        </div>
+        <div class="sdiv"></div>
+        <div class="schem">
+          <div class="srune"><svg viewBox="0 0 18 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M2 21 L2 8 L9 2 L16 8 L16 21"/><path d="M9 21 V12"/></svg></div>
+          <div class="scat">Customer Support</div>
+          <div class="sname">The Gatekeeper's Schematic</div>
+          <p>Sorting incoming messages, answering the known ones, raising tickets, and routing each matter to the right hands.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- EKRAN 2 (wewnetrzne) - copy LEWA, 4 schematy -->
+    <div class="dwrapL" id="dwrap2">
+      <div class="draft-copy" id="dcopy2">
+        <div class="dhead">
+          <div class="eyebrow">Schematics</div>
+          <h3>Schematics that keep the house in order.</h3>
+          <p class="dlede">Plans for the quiet work behind the walls - records, knowledge, and the day itself.</p>
+        </div>
+        <div class="schem">
+          <div class="srune"><svg viewBox="0 0 18 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M9 1 V21"/><path d="M3 5 H15"/><path d="M3 17 H15"/></svg></div>
+          <div class="scat">Administration &amp; Back Office</div>
+          <div class="sname">The Steward's Schematic</div>
+          <p>Handling invoices, moving documents through approval, signing them, filing them away, and keeping systems in step.</p>
+        </div>
+        <div class="sdiv"></div>
+        <div class="schem">
+          <div class="srune"><svg viewBox="0 0 18 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M9 21 V6"/><path d="M9 11 L3 5"/><path d="M9 11 L15 5"/><path d="M9 6 L4 1" opacity=".6"/><path d="M9 6 L14 1" opacity=".6"/></svg></div>
+          <div class="scat">Knowledge Management</div>
+          <div class="sname">The Archivist's Schematic</div>
+          <p>Building knowledge bases, saving notes, ordering documents, and finding the right answer with AI when it's needed.</p>
+        </div>
+        <div class="sdiv"></div>
+        <div class="schem">
+          <div class="srune"><svg viewBox="0 0 18 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M9 1 V21"/><path d="M2 11 L9 6 L16 11 L9 16 Z"/></svg></div>
+          <div class="scat">Reporting</div>
+          <div class="sname">The Watchman's Schematic</div>
+          <p>Daily and weekly reports, dashboards, and data gathered from many systems into a single, honest view.</p>
+        </div>
+        <div class="sdiv"></div>
+        <div class="schem">
+          <div class="srune"><svg viewBox="0 0 18 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M9 1 V21"/><path d="M9 7 L15 4"/><path d="M9 7 L15 10"/></svg></div>
+          <div class="scat">Personal Productivity</div>
+          <div class="sname">The Keeper's Schematic</div>
+          <p>Tasks, calendars, mail, reminders, and small AI assistants - the mechanisms one builds for oneself.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== KUŹNIA / THE FORGE (Lokacja 5) ===== -->
+  <div id="forge">
+    <div class="bgimg" id="fCoral"></div>
+    <div class="bgimg" id="fMvp"></div>
+    <div class="bgimg" id="fStudent"></div>
+    <div class="bgimg" id="fArchicom"></div>
+    <div class="bgimg" id="fRadar"></div>
+    <div class="bgimg" id="fMsi"></div>
+    <div class="bgimg" id="fCorridor"></div>
+    <div id="forgeVign"></div>
+
+    <!-- ekran-zawias: korytarz z drzwiami + krotkie copy -->
+    <div class="transHead forgeThreshHead" id="fThreshHead">
+      <div class="inner">
+        <div class="eyebrow">The Forge</div>
+        <h2>Now the doors.</h2>
+      </div>
+    </div>
+
+    <!-- shades -->
+    <div class="fshadeR" id="fshadeR"></div>
+    <div class="fshadeL" id="fshadeL"></div>
+    <div class="fshadeC" id="fshadeC"></div>
+
+    <!-- I. MSI POLSKA - bohater, copy PRAWA -->
+    <div class="fwrapR" id="fwrap1">
+      <div class="forge-copy" id="fcopy1">
+        <div class="eyebrow">Chamber I &middot; MSI Polska</div>
+        <h3>A team of twenty, a month of work. Then: five people, one week.</h3>
+        <p>Hardware reviews came in as claims - screenshots, view counts, click reports - and lived in email threads and spreadsheets. I moved the whole trade onto Airtable, Bubble, and Make.</p>
+        <p>Forms that make the wrong entry hard to submit. Folder structures that build themselves on Google Drive. Presentations that assemble in Google Slides and go straight to a manager for approval.</p>
+        <p class="fkicker">Six months of work together. The same output, at a fifth of the cost in hands and a quarter of the time.</p>
+      </div>
+    </div>
+
+    <!-- II. RADARPREMIER - copy LEWA -->
+    <div class="fwrapL" id="fwrap2">
+      <div class="forge-copy" id="fcopy2">
+        <div class="eyebrow">Chamber II &middot; RadarPremier</div>
+        <h3>A hall where the work is set out and judged.</h3>
+        <p>Built for easycart - a place where sellers using the cart could put a product forward and let it be seen.</p>
+        <p>Upvotes and a running ranking - daily and weekly. Product pages, ratings, comments. Seller profiles. And a launch, so a new thing arrives with a bit of noise.</p>
+      </div>
+    </div>
+
+    <!-- III. ARCHICOM - bohater, naglowek u gory + dwie rowne kolumny -->
+    <div class="fwrapWide" id="fwrap3">
+      <div class="forge-copy fwide" id="fcopy3a">
+        <div class="fhead3">
+          <div class="eyebrow">Chamber III &middot; ARCHICOM</div>
+          <h3>Two workbenches, one vein of ore.</h3>
+          <p class="fseam">Both benches draw from the same seam: Webcon, the system this developer already ran on. Sound underneath, unlovely on top, and priced per head - so every new user cost more. I built the face; Webcon kept the records.</p>
+        </div>
+        <div class="fcols">
+          <div class="fcol">
+            <div class="fsub">Tenders</div>
+            <p>A dashboard for subcontractors: open and closed tenders, submissions approved by the developer's own department, and each bid walked through its steps - entry, pricing, documents, outcome, contract.</p>
+            <p>A knowledge base and a channel to ask took repeat questions down by sixty-five percent.</p>
+          </div>
+          <div class="fcol">
+            <div class="fsub">Sales</div>
+            <p>A tablet portal for the seller standing on site. Clickable plans - buildings, floors, apartments - each one marked free, reserved, or sold. Live prices and statuses drawn from Webcon.</p>
+            <p>Offers that report back when the client opens them, that can be reserved only from within, and that expire when they should.</p>
+          </div>
+        </div>
+        <p class="fkicker">That's the work nobody photographs: making a friendly thing sit on top of a rigid one, and keeping the two in step.</p>
+      </div>
+    </div>
+
+    <!-- IV. STUDENTSPACE - copy LEWA -->
+    <div class="fwrapL" id="fwrap4">
+      <div class="forge-copy" id="fcopy4">
+        <div class="eyebrow">Chamber IV &middot; StudentSpace</div>
+        <h3>A house that fills itself a year ahead.</h3>
+        <p>Webflow at the front - fast, findable, ready for ads. Bubble behind it, doing the booking. <span class="fseamInline">The same seam underneath</span>: Webcon, holding the records.</p>
+        <p>Rooms reserved a full academic year early. Accounts for an adult student or a legal guardian. Two-person rooms where you bring someone or are matched by gender. A dashboard for contracts, moving in, moving out, extending, changing rooms. A noticeboard for the whole hall, your building, or just your floor. And the air conditioning in your own room, turned from your own screen.</p>
+      </div>
+    </div>
+
+    <!-- V. TWO MVPs - copy PRAWA -->
+    <div class="fwrapR" id="fwrap5">
+      <div class="forge-copy" id="fcopy5">
+        <div class="eyebrow">Chamber V &middot; Two MVPs</div>
+        <h3>Rebuilding familiar worlds from nothing.</h3>
+        <div class="fsub">Job board</div>
+        <p>Search and filters by location, industry, and type. Listing pages, company profiles, candidate accounts with a CV, applying in a single click, saved roles, and a panel for the employer.</p>
+        <div class="fsub">Luxury car rental</div>
+        <p>Clients, cars, and the days each is free. Product pages with the specs that matter. A client dashboard for balance, points, history, and details; an admin dashboard behind it. Booking against a live availability calendar, each rental tracked through its statuses.</p>
+      </div>
+    </div>
+
+    <!-- VI. CORALCARE - copy LEWA -->
+    <div class="fwrapL" id="fwrap6">
+      <div class="forge-copy" id="fcopy6">
+        <div class="eyebrow">Chamber VI &middot; CoralCare</div>
+        <h3>Joining a crew already at work.</h3>
+        <p>Slack, Jira, daily stand-ups - a team mid-stride, and a place to fit into it. I came in on QA and took over a developer's work when he left.</p>
+        <p>Testing my own build and other people's, straight alongside the client, in a stack that reached well past Bubble.</p>
+        <p class="fkicker">The project has since moved on to code - the natural next step once a thing has proven itself.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ATELIER (Lokacja 6) ===== -->
+  <div id="atelier">
+    <div class="bgimg" id="aIsolario"></div>
+    <div class="bgimg" id="aQuad"></div>
+    <div class="bgimg" id="aHearth"></div>
+    <div class="bgimg" id="aWonder"></div>
+    <div class="bgimg" id="aSatori"></div>
+    <div class="bgimg" id="aHomer"></div>
+    <div class="bgimg" id="aThresh"></div>
+    <div id="atelierVign"></div>
+
+    <!-- ekran-brama: galeria + krasnolud + runa -->
+    <div class="transHead atelierThreshHead" id="aThreshHead">
+      <div class="inner">
+        <div class="eyebrow">The Atelier</div>
+        <h2>After hours.</h2>
+      </div>
+    </div>
+
+    <!-- shades -->
+    <div class="ashadeR" id="ashadeR"></div>
+    <div class="ashadeL" id="ashadeL"></div>
+
+    <!-- I. HOMER - copy PRAWA -->
+    <div class="awrapR" id="awrap1">
+      <div class="atelier-copy" id="acopy1">
+        <div class="eyebrow">Pane I &middot; HOMER</div>
+        <h3>The future moved in.</h3>
+        <p>A household robot sold like a 1962 refrigerator - warm, not clinical.</p>
+        <p>Scroll choreography where every motion means something.</p>
+        <div class="atech">Nano Banana Pro &middot; Kling 3.0 &middot; GSAP ScrollTrigger</div>
+        <div class="alinks">
+          <a class="alink" href="https://homer-mu.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
+          <a class="asrc" href="https://github.com/WebDevCaveman/homer" target="_blank" rel="noopener noreferrer">source &#8599;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- II. SATORI - copy LEWA -->
+    <div class="awrapL" id="awrap2">
+      <div class="atelier-copy" id="acopy2">
+        <div class="eyebrow">Pane II &middot; SATORI</div>
+        <h3>Stillness, staged.</h3>
+        <p>An oriental spa that sells the pause, not the price list.</p>
+        <p>Cinematic transitions built to slow the visitor down.</p>
+        <div class="atech">AURELIA framework &middot; Higgsfield stills &middot; motion design</div>
+        <div class="alinks">
+          <a class="alink" href="https://satori-spa-theta.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
+          <a class="asrc" href="https://github.com/WebDevCaveman/satori-spa" target="_blank" rel="noopener noreferrer">source &#8599;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- III. WONDERYEAR - copy PRAWA -->
+    <div class="awrapR" id="awrap3">
+      <div class="atelier-copy" id="acopy3">
+        <div class="eyebrow">Pane III &middot; WONDERYEAR</div>
+        <h3>One building, four seasons.</h3>
+        <p>The same walls bloom into summer, autumn, winter, spring - and the site knows which month it is.</p>
+        <p>An animated mask hands the hero from one season to the next.</p>
+        <div class="atech">Nano Banana Pro &middot; animated clip-path &middot; Canvas particles</div>
+        <div class="alinks">
+          <a class="alink" href="https://wonderyear.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
+          <a class="asrc" href="https://github.com/WebDevCaveman/wonderyear" target="_blank" rel="noopener noreferrer">source &#8599;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- IV. Hearth &amp; Fable - copy LEWA -->
+    <div class="awrapL" id="awrap4">
+      <div class="atelier-copy" id="acopy4">
+        <div class="eyebrow">Pane IV &middot; Hearth &amp; Fable</div>
+        <h3>Four generations, one oven.</h3>
+        <p>A bakery told as a storybook - thirty watercolours, two colours, no photographs.</p>
+        <p>Every effect is a still, animated in the browser. No video at all.</p>
+        <div class="atech">Nano Banana Pro &middot; layered parallax &middot; micro-loops</div>
+        <div class="alinks">
+          <a class="alink" href="https://hearth-and-fable.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
+          <a class="asrc" href="https://github.com/WebDevCaveman/hearth-and-fable" target="_blank" rel="noopener noreferrer">source &#8599;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- V. QUAD - copy PRAWA -->
+    <div class="awrapR" id="awrap5">
+      <div class="atelier-copy" id="acopy5">
+        <div class="eyebrow">Pane V &middot; QUAD</div>
+        <h3>Which dorm are you?</h3>
+        <p>Four halls with four temperaments - the site sorts you in about a minute.</p>
+        <p>One design system holding four personalities apart without breaking.</p>
+        <div class="atech">51 photographs &middot; 12 hand-drawn crests &middot; GSAP Flip</div>
+        <div class="alinks">
+          <a class="alink" href="https://quad-ochre.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
+          <a class="asrc" href="https://github.com/WebDevCaveman/quad" target="_blank" rel="noopener noreferrer">source &#8599;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- VI. ISOLARIO - copy LEWA -->
+    <div class="awrapL" id="awrap6">
+      <div class="atelier-copy" id="acopy6">
+        <div class="eyebrow">Pane VI &middot; ISOLARIO</div>
+        <h3>Not found on any map.</h3>
+        <p>Eighty-eight watches, named after eighty-eight constellations - a private viewing, not a shop.</p>
+        <p>No prices, no loud calls to action. The restraint is the pitch.</p>
+        <div class="atech">AURELIA v2.2 &middot; Kling 3.0 loops &middot; quiet luxury</div>
+        <div class="alinks">
+          <a class="alink" href="https://isolario.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
+          <a class="asrc" href="https://github.com/WebDevCaveman/isolario" target="_blank" rel="noopener noreferrer">source &#8599;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SALA PLANOW (Lokacja 7) ===== -->
+  <div id="planning">
+    <div class="bgimg" id="pCozy"></div>
+    <div class="bgimg" id="pRadar"></div>
+    <div class="bgimg" id="pThresh"></div>
+    <div id="planningVign"></div>
+
+    <!-- ekran-brama: pusta hala + krasnolud + runa -->
+    <div class="transHead planningThreshHead" id="pThreshHead">
+      <div class="inner">
+        <div class="eyebrow">The Planning Hall</div>
+        <h2>What isn't built yet.</h2>
+      </div>
+    </div>
+
+    <div class="pshadeR" id="pshadeR"></div>
+    <div class="pshadeL" id="pshadeL"></div>
+
+    <!-- I. PRODUCT RADAR - copy PRAWA (pomiar: prawa max 63) -->
+    <div class="pwrapR" id="pwrap1">
+      <div class="planning-copy" id="pcopy1">
+        <div class="eyebrow">Plan I &middot; Product Radar</div>
+        <div class="pstatus">In the forge</div>
+        <h3>A daily cycle of launches &mdash; makers ship, early adopters find.</h3>
+        <p>Eleven tables with row-level security, triggers keeping the counts honest, and full-text search. A design system shipped as its own npm package before the first screen exists.</p>
+        <p class="pcount">Nine phases. Thirty-three steps. Every one with a written prompt waiting for it.</p>
+        <div class="atech">Next.js 15 &middot; React 19 &middot; Supabase &middot; Tailwind v4</div>
+        <!-- LINKI: dodac gdy aplikacja bedzie zbudowana (13.3) - markup jak w Atelier:
+        <div class="alinks">
+          <a class="alink" href="" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
+          <a class="asrc" href="" target="_blank" rel="noopener noreferrer">source &#8599;</a>
+        </div> -->
+      </div>
+    </div>
+
+    <!-- II. COZYSTAY - copy LEWA (pomiar: lewa max 40) -->
+    <div class="pwrapL" id="pwrap2">
+      <div class="planning-copy" id="pcopy2">
+        <div class="eyebrow">Plan II &middot; CozyStay</div>
+        <div class="pstatus">Next on the bench</div>
+        <h3>A two-sided marketplace for short stays &mdash; guests, hosts, and money moving safely between them.</h3>
+        <p>Eighteen tables. PostGIS for the map. Date-range exclusion constraints so a double booking is physically impossible, not merely discouraged. Stripe Connect with the platform's cut split at the source.</p>
+        <p class="pcount">Twelve phases. Sixty-two steps, each with its own Definition of Done.</p>
+        <div class="atech">Next.js 15 &middot; PostgreSQL &middot; Stripe Connect &middot; Expo</div>
+        <!-- LINKI: dodac gdy aplikacja bedzie zbudowana (13.3) -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BIBLIOTEKA (Lokacja 8) ===== -->
+  <div id="library">
+    <div class="bgimg" id="lScen"></div>
+    <div class="bgimg" id="lDesk"></div>
+    <div class="bgimg" id="lThresh"></div>
+    <div id="libraryVign"></div>
+
+    <!-- ekran-brama: skryptorium + krasnolud przy pulpicie + runa w zworniku -->
+    <div class="transHead libraryThreshHead" id="lThreshHead">
+      <div class="inner">
+        <div class="eyebrow">The Library</div>
+        <h2>What was learned here is taught here.</h2>
+      </div>
+    </div>
+
+    <div class="lshadeL" id="lshadeL"></div>
+    <div class="lshadeR" id="lshadeR"></div>
+
+    <!-- I. KURS BUBBLE - copy LEWA (pomiar: lewa p95=33, kontrast 13.9:1) -->
+    <div class="lwrapL" id="lwrap1">
+      <div class="library-copy" id="lcopy1">
+        <div class="eyebrow">Shelf I &middot; Authored course</div>
+        <div class="lstatus">Authored course</div>
+        <h3>What was learned once, written down twice.</h3>
+        <p>A two-part Bubble course, built from scratch - first the design and the editor, then the logic that turns a layout into an application. Database work, privacy rules, front and backend workflows, Stripe payments, auto-binding, in-app messaging, branded email, Google SSO, automation through Make.</p>
+        <p>Also taught live - 8 weeks per cohort.</p>
+        <p class="lcount">94 video lessons - 32h 55min of material.</p>
+        <p class="ldetail">Built on StayNest, a full Airbnb-style rental portal made specifically so it could be taken apart and rebuilt.</p>
+        <div class="alinks llinks">
+          <a class="alink" href="https://eduweb.pl/ui-ux-i-webdesign/inne/mvp-aplikacji-w-rekordowym-czasie-z-bubble" target="_blank" rel="noopener noreferrer">Part one - design &#8599;</a>
+          <a class="alink" href="https://eduweb.pl/biznes-i-automatyzacje/inne/mvp-aplikacji-z-bubble-logika" target="_blank" rel="noopener noreferrer">Part two - logic &#8599;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- II. ZAUTOMATYZOWANI - copy PRAWA (pomiar: prawa p95=48, kontrast 11.5:1) -->
+    <div class="lwrapR" id="lwrap2">
+      <div class="library-copy" id="lcopy2">
+        <div class="eyebrow">Shelf II &middot; Automation programme</div>
+        <div class="lstatus">Contributing author</div>
+        <h3>A hundred machines, handed over.</h3>
+        <p>Ready-made automation scenarios - not theory to memorise, but working builds to copy and bend to your own case. Make, Zapier, Airtable, AI assistants wired into everyday work.</p>
+        <p>Not the lead author - the one who built the scenarios and stayed.</p>
+        <p class="lcount">~100 scenarios - 5 consecutive cohorts.</p>
+        <p class="ldetail">Community support and weekly consultations for every participant.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PALENISKO (Lokacja 9) ===== -->
+  <div id="hearth">
+    <div class="bgimg" id="hRoom"></div>
+    <div id="hearthVign"></div>
+    <div class="hshade" id="hshade"></div>
+
+    <div class="hwrap">
+      <div class="hearth-copy" id="hcopy">
+        <div class="eyebrow">The Hearth</div>
+        <h2>Every forge keeps one fire that isn't for work.</h2>
+        <p class="hsub">This is where the tools go down and the talking starts. If something here looked like it belongs in your world - say so.</p>
+
+        <form class="hform" id="hform" novalidate>
+          <div class="hrow">
+            <div class="hfield" id="fldName">
+              <label for="hName">Name</label>
+              <input type="text" id="hName" name="name" maxlength="80" autocomplete="name" placeholder="Who's writing">
+              <div class="herr">Tell me what to call you.</div>
+            </div>
+            <div class="hfield" id="fldMail">
+              <label for="hMail">Email</label>
+              <input type="email" id="hMail" name="email" maxlength="120" autocomplete="email" placeholder="Where the reply goes">
+              <div class="herr">That address doesn't look right.</div>
+            </div>
+          </div>
+          <div class="hfield" id="fldMsg">
+            <label for="hMsg">What you're building</label>
+            <textarea id="hMsg" name="message" maxlength="2000" placeholder="A few lines are enough"></textarea>
+            <div class="herr">A sentence or two, at least.</div>
+          </div>
+          <div class="hpot" aria-hidden="true">
+            <label for="hCompany">Company</label>
+            <input type="text" id="hCompany" name="company" tabindex="-1" autocomplete="off">
+          </div>
+          <button type="submit" class="hsend" id="hsend">Send it down the mountain &rarr;</button>
+          <div class="hfail" id="hfail" role="status" aria-live="polite"></div>
+        </form>
+
+        <p class="hnote">Fires are tended, not automated - expect a reply within two working days.</p>
+        <div class="hlinks">
+          <a class="hlink" href="https://www.linkedin.com/in/krzysztof-piekarz-987642168/" target="_blank" rel="noopener noreferrer">LinkedIn &#8599;</a>
+          <a class="hlink" href="https://github.com/WebDevCaveman" target="_blank" rel="noopener noreferrer">GitHub &#8599;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EKRAN-NAGRODA: SWIT (ulotny, bez localStorage) ===== -->
+  <div id="dawn" aria-hidden="true">
+    <div id="dawnBg"></div>
+    <div id="dawnShade"></div>
+    <div class="dwrap">
+      <div class="dawn-copy">
+        <div class="eyebrow">The Mountain Gate, at dawn</div>
+        <h2>Message sent. Now the part that isn't in the portfolio.</h2>
+        <p>You came down through nine halls and out the other side - which is how this work actually goes. Something gets carried down, hammered on for a while, and carried back up into daylight.</p>
+        <p>Whatever you're building is somewhere in that cycle right now.</p>
+        <p class="dclose">The gate stays open.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HERO (na wierzchu) ===== -->
+  <div id="hero">
+    <div class="frame" id="f0"></div>
+    <div class="frame" id="f1"></div>
+    <div class="frame" id="f2"></div>
+    <div class="frame" id="f3"></div>
+    <canvas id="atmoHero"></canvas>
+    <div class="copyshade" id="shade"></div>
+    <div class="wrap">
+      <div class="copyHero" id="copyHero">
+        <div class="eyebrow">No-code / Low-code Craft</div>
+        <h1>What runs above was <span class="warm">forged below.</span></h1>
+        <p class="sub">Deep in the mountain, the systems businesses rely on are hammered into shape - quietly, precisely, by hand.</p>
+      </div>
+    </div>
+    <div class="scrollhint" id="scrollhint">
+      <span class="hintlabel">Scroll to descend</span>
+      <span class="hintrune"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M7 1 V13"/><path d="M2 8 L7 13 L12 8"/><path d="M3.5 4.5 L7 4.5 M10.5 4.5 L7 4.5" opacity=".55"/></svg></span>
+    </div>
+    <button class="skip" id="skip">skip intro</button>
+  </div>
+
+  <div class="progress" id="progress">
+    <div class="progLabel" id="progLabel"></div>
+    <div class="progSub" id="progSub"></div>
+    <div class="progDots"><div class="dot" id="d0"></div><div class="dot" id="d1"></div></div>
+  </div>
+
+  <!-- chrome gorny: menu w prawym gornym rogu, zawsze dostepne od wyjscia z Hero -->
+  <div class="chromeTop">
+    <button class="navBtn" id="navBtn" aria-label="Open map" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="navPanel" id="navPanel" aria-hidden="true">
+    <div class="navTitle">The fortress &middot; nine chambers</div>
+    <div id="navList"></div>
+  </nav>
+
+  <!-- sluza: jedna ilustracja, copy podmieniane wg celu skoku -->
+  <div id="airlock" aria-hidden="true">
+    <div class="albg"></div>
+    <div class="alshade"></div>
+    <div class="alwrap">
+      <div class="alnum" id="alNum"></div>
+      <div class="alname" id="alName"></div>
+      <div class="alsub" id="alSub"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // stany: 'intro' (loader gra) -> 'hero' (copy+CTA) -> 'about' (gest steruje)
+  var state='intro';
+
+  /* ========== HERO LOADER ========== */
+  var frames=[document.getElementById('f0'),document.getElementById('f1'),document.getElementById('f2'),document.getElementById('f3')];
+  var copyHero=document.getElementById('copyHero'), shade=document.getElementById('shade'),
+      atmoHero=document.getElementById('atmoHero'), skip=document.getElementById('skip'),
+      heroEl=document.getElementById('hero'), scrollhint=document.getElementById('scrollhint');
+  var DUR=2600, FADE=1600, curFrame=-1, timer=null, heroDone=false;
+  function showFrame(i){
+    if(i>0){ var prev=frames[i-1]; prev.style.transition='opacity '+FADE+'ms ease'; prev.style.opacity=0; }
+    var f=frames[i]; f.style.transition='opacity '+FADE+'ms ease, transform '+(DUR+FADE)+'ms ease';
+    f.style.opacity=1; requestAnimationFrame(function(){ f.style.transform='scale(1.06)'; });
+  }
+  function landOnHero(){ heroDone=true; state='hero'; frames[3].style.opacity=1;
+    shade.classList.add('show'); copyHero.classList.add('show'); atmoHero.classList.add('show');
+    scrollhint.classList.add('show'); skip.classList.add('hidden'); startAtmoHero(); }
+  function playLoader(){ curFrame++;
+    if(curFrame<frames.length){ showFrame(curFrame);
+      if(curFrame===frames.length-1){ timer=setTimeout(landOnHero,DUR); } else { timer=setTimeout(playLoader,DUR); } } }
+  function doSkip(){ if(heroDone)return; clearTimeout(timer);
+    frames.forEach(function(f,idx){ f.style.transition='opacity 500ms ease'; f.style.opacity=(idx===3?1:0); });
+    frames[3].style.transform='scale(1.06)'; setTimeout(landOnHero,520); }
+  skip.addEventListener('click',doSkip);
+  if(reduce){ frames[3].style.opacity=1; frames[3].style.transform='scale(1)'; landOnHero(); }
+  else { setTimeout(playLoader,400); }
+
+  /* ========== PRZEJSCIE HERO -> ABOUT (plynne, sterowane gestem) ========== */
+  var aboutEl=document.getElementById('about'), progressEl=document.getElementById('progress');
+  // gdy user zaczyna scrollowac na hero, aktywujemy About POD spodem i plynnie
+  // wygaszamy hero w miare jak rosnie aboutTarget (brama juz sie przyblizy).
+  function beginDescent(){
+    if(state!=='hero')return; state='about'; descended=false;
+    aboutEl.classList.add('active');   // About widoczne pod hero
+    scrollhint.style.opacity='0';      // indykator pojawi sie dopiero na ekranie tresciowym (nie na bramie)
+    // hero NIE znika od razu - gasnie stopniowo wraz z progress (w renderAbout)
+  }
+
+  /* ========== ABOUT FLOW (gest steruje progress 0..1) ========== */
+  var trans=document.getElementById('trans'), hall=document.getElementById('hall'), cloi=document.getElementById('cloi'),
+      shadeHall=document.getElementById('shadeHall'), shadeCloi=document.getElementById('shadeCloi'),
+      atmoAbout=document.getElementById('atmoAbout'), copyHall=document.getElementById('copyHall'), wrapCloi=document.getElementById('wrapCloi'),
+      d0=document.getElementById('d0'), d1=document.getElementById('d1'), progLabel=document.getElementById('progLabel'), progSub=document.getElementById('progSub'),
+      transHead=document.getElementById('transHead');
+  /* Sekcja wygaszona do opacity:0 NADAL siedzi w drzewie kompozycji GPU.
+     Przy Kuzni oznaczalo to 17 pelnoekranowych tekstur naraz (Kuznia 7 + Warsztat 3
+     + Career 4 + About 3) i skokowe wyrzucanie warstw = artefakty przy przejsciach.
+     visibility:hidden pozwala przegladarce zwolnic warstwy niewidocznej sekcji. */
+  function fadeSection(el,v){
+    el.style.opacity=String(v);
+    var live = v>0.01;
+    el.style.pointerEvents = live ? 'auto' : 'none';
+    el.style.visibility = live ? 'visible' : 'hidden';
+  }
+
+  function cl(v,a,b){return Math.min(b,Math.max(a,v));}
+  var aboutP=0, aboutTarget=0, descended=false;
+  function renderAbout(p){
+    // gdy progress raz przekroczyl prog bramy, dopiero wtedy pozwalamy na powrot do hero
+    if(p>0.05) descended=true;
+    // HERO gasnie plynnie w pierwszych 12% progressu (przejscie przez brame)
+    // ODWRACALNE: uzywamy opacity+pointer-events zamiast display:none,
+    // zeby scroll w gore w okolicy bramy przywracal hero.
+    var heroFade=cl(1-p/0.12,0,1);
+    fadeSection(heroEl,heroFade);
+    // gdy wrocilismy praktycznie na sam poczatek - oddajemy sterowanie hero
+    if(descended && p<=0.01 && state==='about'){
+      state='hero'; descended=false;
+      aboutTarget=0; aboutP=0;           // reset - kolejne zejscie startuje od zera
+      heroEl.style.opacity='1';
+      heroEl.style.pointerEvents='auto'; heroEl.style.visibility='';
+      aboutEl.classList.remove('active');
+      progressEl.classList.remove('show');
+      scrollhint.style.opacity='';       // wraca wskazowka "scroll to descend"
+      return;
+    }
+    // BRAMA: pelne opacity plateau do 0.42, potem wyrazny zanik do 0.60 (widoczne przejscie przez luk)
+    trans.style.transform='scale('+(1+cl(p/0.6,0,1)*0.7)+')';
+    trans.style.opacity=String(cl(1-(p-0.42)/0.18,0,1));
+    // COPY BRAMY (pytanie "kim jestem" - glos miejsca): pojawia sie gdy brama osiadla,
+    // znika zanim zacznie gasnac i zanim wejdzie copy Sali. Trans plateau = 0.12..0.42.
+    transHead.classList.toggle('show', p>0.14 && p<0.36);
+    // SALA wchodzi dopiero gdy brama praktycznie zniknela
+    var hallVis=cl(1-(p-0.72)/0.2,0,1);
+    hall.style.opacity=String(hallVis);
+    hall.style.transform='scale('+(1.06-cl(p/0.6,0,1)*0.06)+')';
+    var hp=cl((p-0.4)/0.15,0,1)*cl(1-(p-0.62)/0.1,0,1);
+    shadeHall.style.opacity=String(hp);
+    copyHall.classList.toggle('show', p>0.44 && p<0.64);
+    var cp=cl((p-0.72)/0.2,0,1);
+    cloi.style.opacity=String(cp); shadeCloi.style.opacity=String(cp);
+    wrapCloi.classList.toggle('show', p>0.82);
+    window.__atmoHall=cl((p-0.5)/0.06,0,1)*cl(1-(p-0.58)/0.05,0,1);
+    window.__atmoCloi=cl((p-0.78)/0.08,0,1);
+    // INDYKATOR SEKCJI: ukryty na bramie (przejscie), widoczny na ekranach tresciowych About.
+    // About ma 2 ekrany tresciowe: Wielka Sala (kropka 1) i kruzganek (kropka 2).
+    var onContent = p>=0.5;                      // brama zanika -> pokazujemy indykator razem z copy Sali
+    progressEl.classList.toggle('show', onContent);
+    if(onContent){
+      progLabel.textContent='The Great Hall'; progSub.textContent='Intro';
+      var screen2 = p>=0.78;                     // przelaczenie Sala -> kruzganek
+      d0.classList.toggle('on', !screen2);
+      d1.classList.toggle('on', screen2);
+    }
+  }
+  function addAbout(dl){ aboutTarget=cl(aboutTarget+dl,0,1); }
+  // czy About jest juz na koncu (kruzganek) i user chce zejsc glebiej -> Career
+  function aboutAtEnd(){ return aboutTarget>0.995 && aboutP>0.98; }
+  if(reduce){ renderAbout(1); wrapCloi.classList.add('show'); }
+  (function tickAbout(){
+    aboutP+=(aboutTarget-aboutP)*0.06;
+    // snap do celu gdy roznica minimalna - lerp asymptotycznie nigdy nie dochodzi
+    // do progu powrotu (<=0.002), przez co powrot do hero potrafil "utknac".
+    if(Math.abs(aboutTarget-aboutP)<0.0015) aboutP=aboutTarget;
+    if(state==='about') renderAbout(aboutP);
+    requestAnimationFrame(tickAbout);
+  })();
+
+  /* ========== CAREER FLOW (Three Roads) ==========
+     Ekran mapy (przejscie, sterowane gestem) -> 3 krainy (Eduweb, BPMRIDERS, ProNoCoders).
+     Podobny model do About: gest steruje careerP 0..1, cross-fade + reveal copy.
+     Copy-safe: Eduweb=L, BPMRIDERS=R, ProNoCoders=L. */
+  var careerEl=document.getElementById('career'),
+      cmap=document.getElementById('cmap'), cland1=document.getElementById('cland1'),
+      cland2=document.getElementById('cland2'), cland3=document.getElementById('cland3'),
+      cmapHead=document.getElementById('cmapHead'),
+      cshadeL=document.getElementById('cshadeL'), cshadeR=document.getElementById('cshadeR'),
+      ccopy1=document.getElementById('ccopy1'), ccopy2=document.getElementById('ccopy2'), ccopy3=document.getElementById('ccopy3'),
+      atmoCareer=document.getElementById('atmoCareer');
+  var careerP=0, careerTarget=0, careerEntered=false;
+
+  function beginCareer(){
+    if(state!=='career-arm')return;
+    state='career'; careerEntered=false;
+    careerEl.classList.add('active');
+    progressEl.classList.remove('show'); // wroci na ekranie tresciowym krainy
+  }
+
+  function renderCareer(p){
+    if(p>0.05) careerEntered=true;
+    // ABOUT (kruzganek) gasnie plynnie w pierwszych 12% - wejscie do sali map
+    var aboutFade=cl(1-p/0.12,0,1);
+    fadeSection(aboutEl,aboutFade);
+    // powrot do About gdy zjedziemy do samego poczatku
+    if(careerEntered && p<=0.01 && state==='career'){
+      state='about'; careerEntered=false;
+      careerTarget=0; careerP=0;
+      aboutEl.classList.add('active');   // po skoku poprzednia sekcja moze byc nieaktywna -> szary ekran
+      aboutEl.style.opacity=''; aboutEl.style.pointerEvents=''; aboutEl.style.visibility='';
+      careerEl.classList.remove('active');
+      progressEl.classList.remove('show');
+      // ukryj trzecia kropke (Career) - About ma tylko 2
+      if(d2){ d2.style.display='none'; d2.classList.remove('on'); }
+      // About wraca w stanie kruzganka (p=1)
+      aboutTarget=1; aboutP=1; renderAbout(1); wrapCloi.classList.add('show');
+      return;
+    }
+
+    // --- Ekran 0: MAPA (przejscie, ok. 0..0.24) ---
+    // Mapa siedzi w regime forteca (granit + ogien) - zostaje statyczna, delikatny zoom.
+    cmap.style.transform='scale('+(1+cl(p/0.6,0,1)*0.5)+')';
+    cmap.style.opacity=String(cl(1-(p-0.18)/0.1,0,1));
+    cmapHead.classList.toggle('show', p<0.22);
+
+    // --- Kraina 1: Eduweb (copy LEWO), ok. 0.24..0.52 ---
+    var l1=cl((p-0.2)/0.08,0,1)*cl(1-(p-0.5)/0.08,0,1);
+    cland1.style.opacity=String(l1);
+    cland1.style.transform='scale('+(1.05-cl((p-0.2)/0.3,0,1)*0.05)+')';
+
+    // --- Kraina 2: BPMRIDERS (copy PRAWO), ok. 0.52..0.76 ---
+    var l2=cl((p-0.48)/0.08,0,1)*cl(1-(p-0.74)/0.08,0,1);
+    cland2.style.opacity=String(l2);
+    cland2.style.transform='scale('+(1.05-cl((p-0.48)/0.3,0,1)*0.05)+')';
+
+    // --- Kraina 3: ProNoCoders (copy LEWO), ok. 0.76..1 ---
+    var l3=cl((p-0.72)/0.08,0,1);
+    cland3.style.opacity=String(l3);
+    cland3.style.transform='scale('+(1.05-cl((p-0.72)/0.3,0,1)*0.05)+')';
+
+    // copy reveal + shade per kraina (L/R)
+    var show1 = p>0.28 && p<0.5;
+    var show2 = p>0.56 && p<0.74;
+    var show3 = p>0.8;
+    ccopy1.classList.toggle('show', show1);
+    ccopy2.classList.toggle('show', show2);
+    ccopy3.classList.toggle('show', show3);
+    // lewy shade dla krainy 1 i 3, prawy dla krainy 2
+    cshadeL.style.opacity = (show1 || show3) ? '1' : '0';
+    cshadeR.style.opacity = show2 ? '1' : '0';
+
+    // atmosfera per kraina (przekazywana do petli canvas)
+    window.__cAtmo1=cl((p-0.24)/0.06,0,1)*cl(1-(p-0.5)/0.05,0,1);
+    window.__cAtmo2=cl((p-0.52)/0.06,0,1)*cl(1-(p-0.74)/0.05,0,1);
+    window.__cAtmo3=cl((p-0.76)/0.06,0,1);
+
+    // INDYKATOR: ukryty na mapie (przejscie), widoczny na krainach. Label THREE ROADS, 3 kropki.
+    var onLand = p>=0.26;
+    progressEl.classList.toggle('show', onLand);
+    if(onLand){
+      progLabel.textContent='Three Roads'; progSub.textContent='Career';
+      ensureThreeDots();
+      setDot(p>=0.76 ? 2 : (p>=0.52 ? 1 : 0));
+    }
+  }
+  function addCareer(dl){ careerTarget=cl(careerTarget+dl,0,1); }
+
+  // indykator: About ma 2 kropki, Career potrzebuje 3. Dodajemy trzecia dynamicznie.
+  var dotsWrap=document.querySelector('.progDots'), d2=null, dotList=[d0,d1];
+  var allDots=[d0,d1]; // pelna pula utworzonych kropek (rosnie wg potrzeb)
+  function ensureDots(n){
+    while(allDots.length<n){
+      var nd=document.createElement('div'); nd.className='dot'; nd.id='d'+allDots.length;
+      dotsWrap.appendChild(nd); allDots.push(nd);
+      if(allDots.length===3) d2=nd; // zachowanie kompatybilnosci z d2
+    }
+    for(var i=0;i<allDots.length;i++) allDots[i].style.display = i<n ? '' : 'none';
+    dotList=allDots.slice(0,n);
+  }
+  function ensureThreeDots(){ ensureDots(3); }
+  function setDot(i){ dotList.forEach(function(d,idx){ if(d) d.classList.toggle('on', idx===i); }); }
+  function careerAtEnd(){ return careerTarget>0.995 && careerP>0.98; }
+
+  /* ========== WARSZTAT / THE DRAFTING ROOM ========== */
+  /* Progresja p: 0..0.30 ekran przejsciowy (copy overlay, jak brama Hero->About)
+     0.30..0.62 Ekran 1 (3 schematy, copy PRAWA)
+     0.62..1.00 Ekran 2 (4 schematy, copy PRAWA).
+     Indykator: label "The Drafting Room", 2 kropki (ekran przejsciowy niemy). */
+  var draftingEl=document.getElementById('drafting'),
+      dThresh=document.getElementById('dThresh'), dOutward=document.getElementById('dOutward'),
+      dInward=document.getElementById('dInward'), dThreshHead=document.getElementById('dThreshHead'),
+      dshadeR=document.getElementById('dshadeR'), dshadeL=document.getElementById('dshadeL'),
+      dcopy1=document.getElementById('dcopy1'), dcopy2=document.getElementById('dcopy2');
+  var draftP=0, draftTarget=0, draftEntered=false;
+
+  function beginDrafting(){
+    if(state!=='drafting-arm')return;
+    state='drafting'; draftEntered=false;
+    draftingEl.classList.add('active');
+    progressEl.classList.remove('show'); // wroci na ekranach tresciowych
+  }
+
+  function renderDrafting(p){
+    if(p>0.05) draftEntered=true;
+    // Career gasnie plynnie w pierwszych 12% - wejscie do sali kreslarskiej
+    var careerFade=cl(1-p/0.12,0,1);
+    fadeSection(careerEl,careerFade);
+    // powrot do Career gdy zjedziemy do samego poczatku
+    if(draftEntered && p<=0.01 && state==='drafting'){
+      state='career'; draftEntered=false;
+      draftTarget=0; draftP=0;
+      careerEl.classList.add('active');   // po skoku poprzednia sekcja moze byc nieaktywna -> szary ekran
+      careerEl.style.opacity=''; careerEl.style.pointerEvents=''; careerEl.style.visibility='';
+      draftingEl.classList.remove('active');
+      progressEl.classList.remove('show');
+      // wroc do 3 kropek Career (ostatnia kraina)
+      ensureThreeDots();
+      careerTarget=1; careerP=1; renderCareer(1);
+      return;
+    }
+
+    // --- Ekran przejsciowy (0..0.30): threshold + copy overlay ---
+    dThresh.style.transform='scale('+(1+cl(p/0.6,0,1)*0.4)+')';
+    dThresh.style.opacity=String(cl(1-(p-0.24)/0.08,0,1));
+    dThreshHead.classList.toggle('show', p<0.22);
+
+    // --- Ekran 1 (zewnetrzne), ok. 0.30..0.62 ---
+    var e1=cl((p-0.24)/0.08,0,1)*cl(1-(p-0.60)/0.06,0,1);
+    dOutward.style.opacity=String(e1);
+    dOutward.style.transform='scale('+(1.05-cl((p-0.24)/0.4,0,1)*0.05)+')';
+
+    // --- Ekran 2 (wewnetrzne), ok. 0.62..1 ---
+    var e2=cl((p-0.58)/0.08,0,1);
+    dInward.style.opacity=String(e2);
+    dInward.style.transform='scale('+(1.05-cl((p-0.58)/0.4,0,1)*0.05)+')';
+
+    // copy reveal + shade
+    var show1 = p>0.34 && p<0.60;
+    var show2 = p>0.66;
+    dcopy1.classList.toggle('show', show1);
+    dcopy2.classList.toggle('show', show2);
+    dshadeR.style.opacity = show1 ? '1' : '0';
+    dshadeL.style.opacity = show2 ? '1' : '0';
+
+    // INDYKATOR: ukryty na ekranie przejsciowym, widoczny na ekranach tresciowych. 2 kropki.
+    var onScreen = p>=0.32;
+    progressEl.classList.toggle('show', onScreen);
+    if(onScreen){
+      progLabel.textContent='The Drafting Room'; progSub.textContent='What I automate';
+      ensureTwoDraftDots();
+      setDot(p>=0.62 ? 1 : 0);
+    }
+  }
+  function addDrafting(dl){ draftTarget=cl(draftTarget+dl,0,1); }
+
+  // Warsztat ma 2 kropki.
+  function ensureTwoDraftDots(){ ensureDots(2); }
+  function draftingAtEnd(){ return draftTarget>0.995 && draftP>0.98; }
+
+  /* ========== KUŹNIA / THE FORGE ========== */
+  /* p: 0..0.16 korytarz-zawias (copy krotkie, jak inne bramy)
+     potem 6 komnat po ~0.14 kazda. Indykator: "The Forge", 6 kropek. */
+  var forgeEl=document.getElementById('forge'),
+      fCorridor=document.getElementById('fCorridor'), fThreshHead=document.getElementById('fThreshHead'),
+      fshadeR=document.getElementById('fshadeR'), fshadeL=document.getElementById('fshadeL'),
+      fshadeC=document.getElementById('fshadeC');
+  var fBg=[document.getElementById('fMsi'),document.getElementById('fRadar'),document.getElementById('fArchicom'),
+           document.getElementById('fStudent'),document.getElementById('fMvp'),document.getElementById('fCoral')];
+  var fCopy=[document.getElementById('fcopy1'),document.getElementById('fcopy2'),document.getElementById('fcopy3a'),
+             document.getElementById('fcopy4'),document.getElementById('fcopy5'),document.getElementById('fcopy6')];
+  // strona copy dla kazdej komnaty: 'R','L','WIDE','L','R','L'
+  var fSide=['R','L','WIDE','L','R','L'];
+  var forgeP=0, forgeTarget=0, forgeEntered=false;
+  var F_START=0.16, F_SPAN=(1-F_START)/6; // poczatek komnat i dlugosc jednej
+
+  function beginForge(){
+    if(state!=='forge-arm')return;
+    state='forge'; forgeEntered=false;
+    forgeEl.classList.add('active');
+    progressEl.classList.remove('show');
+  }
+
+  function renderForge(p){
+    if(p>0.05) forgeEntered=true;
+    // Warsztat gasnie w pierwszych 12%
+    var draftFade=cl(1-p/0.12,0,1);
+    fadeSection(draftingEl,draftFade);
+    // powrot do Warsztatu
+    if(forgeEntered && p<=0.01 && state==='forge'){
+      state='drafting'; forgeEntered=false;
+      forgeTarget=0; forgeP=0;
+      draftingEl.classList.add('active');   // po skoku poprzednia sekcja moze byc nieaktywna -> szary ekran
+      draftingEl.style.opacity=''; draftingEl.style.pointerEvents=''; draftingEl.style.visibility='';
+      forgeEl.classList.remove('active');
+      progressEl.classList.remove('show');
+      ensureDots(2);
+      draftTarget=1; draftP=1; renderDrafting(1);
+      return;
+    }
+
+    // --- korytarz-zawias ---
+    fCorridor.style.transform='scale('+(1+cl(p/0.5,0,1)*0.35)+')';
+    // z-index maleje wg narracji: kazda kolejna komnata jest POD poprzednia.
+    // Dlatego nie mieszamy warstw (to dawalo przygaszenie 0.5+0.5), tylko ODSLANIAMY:
+    // dolna warstwa siedzi na pelnym opacity, a gorna gasnie nad nia.
+    fCorridor.style.opacity=String(cl(1-(p-(F_START-0.04))/0.06,0,1));
+    fThreshHead.classList.toggle('show', p<0.13);
+
+    // --- 6 komnat: odslanianie + reveal copy ---
+    var active=-1, sideNow=null;
+    for(var i=0;i<6;i++){
+      var s=F_START+i*F_SPAN;          // start komnaty
+      // warstwa jest w pelni widoczna od momentu, gdy zaczyna sie jej czas...
+      var on = p > (s-0.04) ? 1 : 0;
+      // ...i gasnie dopiero gdy wchodzi nastepna (ostatnia nie gasnie nigdy)
+      var fade = (i<5)? cl(1-(p-(s+F_SPAN-0.04))/0.06,0,1) : 1;
+      var o=on*fade;
+      fBg[i].style.opacity=String(o);
+      fBg[i].style.transform='scale('+(1.05-cl((p-(s-0.04))/0.35,0,1)*0.05)+')';
+      // copy widoczne w srodkowej czesci okna komnaty
+      var vis = p>(s+0.02) && p<(s+F_SPAN-0.03);
+      if(fCopy[i]) fCopy[i].classList.toggle('show', vis);
+      if(vis){ active=i; sideNow=fSide[i]; }
+    }
+
+    // shade wg strony copy aktywnej komnaty (WIDE = przyciemnienie calego kadru)
+    fshadeR.style.opacity = (sideNow==='R') ? '1' : '0';
+    fshadeL.style.opacity = (sideNow==='L') ? '1' : '0';
+    fshadeC.style.opacity = (sideNow==='WIDE') ? '1' : '0';
+
+    // INDYKATOR: ukryty na zawiasie, 6 kropek na komnatach
+    var onChamber = p>=F_START-0.02;
+    progressEl.classList.toggle('show', onChamber);
+    if(onChamber){
+      progLabel.textContent='The Forge'; progSub.textContent='Selected projects';
+      ensureDots(6);
+      var idx=cl(Math.floor((p-F_START)/F_SPAN),0,5);
+      setDot(idx);
+    }
+  }
+  function addForge(dl){ forgeTarget=cl(forgeTarget+dl,0,1); }
+
+  /* ========== ATELIER (Lokacja 6) ==========
+     p: 0..0.16 brama-galeria (copy krotkie, jak inne bramy)
+     potem 6 witrazy po ~0.14. Indykator: "The Atelier", 6 kropek.
+     Copy w PASACH BOCZNYCH naprzemiennie R/L/R/L/R/L (pomiar 12.13). */
+  var atelierEl=document.getElementById('atelier'),
+      aThresh=document.getElementById('aThresh'), aThreshHead=document.getElementById('aThreshHead'),
+      ashadeR=document.getElementById('ashadeR'), ashadeL=document.getElementById('ashadeL');
+  var aBg=[document.getElementById('aHomer'),document.getElementById('aSatori'),document.getElementById('aWonder'),
+           document.getElementById('aHearth'),document.getElementById('aQuad'),document.getElementById('aIsolario')];
+  var aCopy=[document.getElementById('acopy1'),document.getElementById('acopy2'),document.getElementById('acopy3'),
+             document.getElementById('acopy4'),document.getElementById('acopy5'),document.getElementById('acopy6')];
+  var aSide=['R','L','R','L','R','L'];
+  var atelierP=0, atelierTarget=0, atelierEntered=false;
+  var A_START=0.16, A_SPAN=(1-A_START)/6;
+
+  function beginAtelier(){
+    if(state!=='atelier-arm')return;
+    state='atelier'; atelierEntered=false;
+    atelierEl.classList.add('active');
+    progressEl.classList.remove('show');
+  }
+
+  function renderAtelier(p){
+    if(p>0.05) atelierEntered=true;
+    // Kuznia gasnie w pierwszych 12%
+    var forgeFade=cl(1-p/0.12,0,1);
+    fadeSection(forgeEl,forgeFade);
+    // powrot do Kuzni
+    if(atelierEntered && p<=0.01 && state==='atelier'){
+      state='forge'; atelierEntered=false;
+      atelierTarget=0; atelierP=0;
+      forgeEl.classList.add('active');   // po skoku poprzednia sekcja moze byc nieaktywna -> szary ekran
+      forgeEl.style.opacity=''; forgeEl.style.pointerEvents=''; forgeEl.style.visibility='';
+      atelierEl.classList.remove('active');
+      progressEl.classList.remove('show');
+      ensureDots(6);
+      forgeTarget=1; forgeP=1; renderForge(1);
+      return;
+    }
+
+    // --- brama-galeria ---
+    aThresh.style.transform='scale('+(1+cl(p/0.5,0,1)*0.3)+')';
+    aThresh.style.opacity=String(cl(1-(p-(A_START-0.04))/0.06,0,1));
+    aThreshHead.classList.toggle('show', p<0.13);
+
+    // --- 6 witrazy: ODSLANIANIE (wzorzec 10.5) ---
+    var sideNow=null;
+    for(var i=0;i<6;i++){
+      var st=A_START+i*A_SPAN;
+      var on = p > (st-0.04) ? 1 : 0;
+      var fade = (i<5)? cl(1-(p-(st+A_SPAN-0.04))/0.06,0,1) : 1;
+      aBg[i].style.opacity=String(on*fade);
+      // witraz oddycha delikatnie - swiatlo za szklem
+      aBg[i].style.transform='scale('+(1.04-cl((p-(st-0.04))/0.35,0,1)*0.04)+')';
+      var vis = p>(st+0.02) && p<(st+A_SPAN-0.03);
+      if(aCopy[i]) aCopy[i].classList.toggle('show', vis);
+      if(vis) sideNow=aSide[i];
+    }
+    ashadeR.style.opacity = (sideNow==='R') ? '1' : '0';
+    ashadeL.style.opacity = (sideNow==='L') ? '1' : '0';
+
+    // INDYKATOR
+    var onPane = p>=A_START-0.02;
+    progressEl.classList.toggle('show', onPane);
+    if(onPane){
+      progLabel.textContent='The Atelier'; progSub.textContent='Brand experiences';
+      ensureDots(6);
+      setDot(cl(Math.floor((p-A_START)/A_SPAN),0,5));
+    }
+  }
+  function addAtelier(dl){ atelierTarget=cl(atelierTarget+dl,0,1); }
+
+  /* ========== SALA PLANOW (Lokacja 7) ==========
+     p: 0..0.22 brama (pusta hala), potem 2 plany po ~0.39.
+     Celowo KROTKA sekcja - po dwoch szostkach (Kuznia, Atelier) trzecia byla by bledem rytmicznym. */
+  var planningEl=document.getElementById('planning'),
+      pThresh=document.getElementById('pThresh'), pThreshHead=document.getElementById('pThreshHead'),
+      pshadeR=document.getElementById('pshadeR'), pshadeL=document.getElementById('pshadeL');
+  var pBg=[document.getElementById('pRadar'),document.getElementById('pCozy')];
+  var pCopy=[document.getElementById('pcopy1'),document.getElementById('pcopy2')];
+  var pSide=['R','L'];
+  var planP=0, planTarget=0, planEntered=false;
+  var P_START=0.22, P_SPAN=(1-P_START)/2;
+
+  function beginPlanning(){
+    if(state!=='planning-arm')return;
+    state='planning'; planEntered=false;
+    planningEl.classList.add('active');
+    progressEl.classList.remove('show');
+  }
+
+  function renderPlanning(p){
+    if(p>0.05) planEntered=true;
+    var atelFade=cl(1-p/0.12,0,1);
+    fadeSection(atelierEl,atelFade);
+    if(planEntered && p<=0.01 && state==='planning'){
+      state='atelier'; planEntered=false;
+      planTarget=0; planP=0;
+      atelierEl.classList.add('active');   // po skoku poprzednia sekcja moze byc nieaktywna -> szary ekran
+      atelierEl.style.opacity=''; atelierEl.style.pointerEvents=''; atelierEl.style.visibility='';
+      planningEl.classList.remove('active');
+      progressEl.classList.remove('show');
+      ensureDots(6);
+      atelierTarget=1; atelierP=1; renderAtelier(1);
+      return;
+    }
+
+    // --- brama: pusta hala ---
+    pThresh.style.transform='scale('+(1+cl(p/0.5,0,1)*0.28)+')';
+    pThresh.style.opacity=String(cl(1-(p-(P_START-0.05))/0.07,0,1));
+    pThreshHead.classList.toggle('show', p<0.18);
+
+    // --- 2 plany: ODSLANIANIE (wzorzec 10.5) ---
+    var sideNow=null;
+    for(var i=0;i<2;i++){
+      var st=P_START+i*P_SPAN;
+      var on = p > (st-0.05) ? 1 : 0;
+      var fade = (i<1)? cl(1-(p-(st+P_SPAN-0.05))/0.07,0,1) : 1;
+      pBg[i].style.opacity=String(on*fade);
+      pBg[i].style.transform='scale('+(1.05-cl((p-(st-0.05))/0.4,0,1)*0.05)+')';
+      var vis = p>(st+0.03) && p<(st+P_SPAN-0.03);
+      if(pCopy[i]) pCopy[i].classList.toggle('show', vis);
+      if(vis) sideNow=pSide[i];
+    }
+    pshadeR.style.opacity = (sideNow==='R') ? '1' : '0';
+    pshadeL.style.opacity = (sideNow==='L') ? '1' : '0';
+
+    var onPlan = p>=P_START-0.02;
+    progressEl.classList.toggle('show', onPlan);
+    if(onPlan){
+      progLabel.textContent='The Planning Hall'; progSub.textContent='In progress';
+      ensureDots(2);
+      setDot(cl(Math.floor((p-P_START)/P_SPAN),0,1));
+    }
+  }
+  function addPlanning(dl){ planTarget=cl(planTarget+dl,0,1); }
+  function atelierAtEnd(){ return atelierP>=0.999; }
+  function forgeAtEnd(){ return forgeP>=0.999; }
+  function planningAtEnd(){ return planP>=0.999; }
+
+  /* ========== BIBLIOTEKA (Lokacja 8) ==========
+     p: 0..0.22 brama (skryptorium), potem 2 polki po ~0.39.
+     Krotka jak Sala Planow - koncowka gory ma wyciszac, nie przyspieszac. */
+  var libraryEl=document.getElementById('library'),
+      lThresh=document.getElementById('lThresh'), lThreshHead=document.getElementById('lThreshHead'),
+      lshadeL=document.getElementById('lshadeL'), lshadeR=document.getElementById('lshadeR');
+  var lBg=[document.getElementById('lDesk'),document.getElementById('lScen')];
+  var lCopy=[document.getElementById('lcopy1'),document.getElementById('lcopy2')];
+  var lSide=['L','R'];
+  var libP=0, libTarget=0, libEntered=false;
+  var L_START=0.22, L_SPAN=(1-L_START)/2;
+
+  function beginLibrary(){
+    if(state!=='library-arm')return;
+    state='library'; libEntered=false;
+    libraryEl.classList.add('active');
+    progressEl.classList.remove('show');
+  }
+
+  function renderLibrary(p){
+    if(p>0.05) libEntered=true;
+    var planFade=cl(1-p/0.12,0,1);
+    fadeSection(planningEl,planFade);
+    if(libEntered && p<=0.01 && state==='library'){
+      state='planning'; libEntered=false;
+      libTarget=0; libP=0;
+      planningEl.classList.add('active');   // po skoku poprzednia sekcja moze byc nieaktywna -> szary ekran
+      planningEl.style.opacity=''; planningEl.style.pointerEvents=''; planningEl.style.visibility='';
+      libraryEl.classList.remove('active');
+      progressEl.classList.remove('show');
+      ensureDots(2);
+      planTarget=1; planP=1; renderPlanning(1);
+      return;
+    }
+
+    // --- brama: skryptorium ---
+    lThresh.style.transform='scale('+(1+cl(p/0.5,0,1)*0.28)+')';
+    lThresh.style.opacity=String(cl(1-(p-(L_START-0.05))/0.07,0,1));
+    lThreshHead.classList.toggle('show', p<0.18);
+
+    // --- 2 polki: ODSLANIANIE (wzorzec 10.5) ---
+    var sideNow=null;
+    for(var i=0;i<2;i++){
+      var st=L_START+i*L_SPAN;
+      var on = p > (st-0.05) ? 1 : 0;
+      var fade = (i<1)? cl(1-(p-(st+L_SPAN-0.05))/0.07,0,1) : 1;
+      lBg[i].style.opacity=String(on*fade);
+      lBg[i].style.transform='scale('+(1.05-cl((p-(st-0.05))/0.4,0,1)*0.05)+')';
+      var vis = p>(st+0.03) && p<(st+L_SPAN-0.03);
+      if(lCopy[i]) lCopy[i].classList.toggle('show', vis);
+      if(vis) sideNow=lSide[i];
+    }
+    lshadeL.style.opacity = (sideNow==='L') ? '1' : '0';
+    lshadeR.style.opacity = (sideNow==='R') ? '1' : '0';
+
+    var onShelf = p>=L_START-0.02;
+    progressEl.classList.toggle('show', onShelf);
+    if(onShelf){
+      progLabel.textContent='The Library'; progSub.textContent='Two shelves';
+      ensureDots(2);
+      setDot(cl(Math.floor((p-L_START)/L_SPAN),0,1));
+    }
+  }
+  function addLibrary(dl){ libTarget=cl(libTarget+dl,0,1); }
+  function libraryAtEnd(){ return libP>=0.999; }
+
+  /* ========== PALENISKO (Lokacja 9) ==========
+     JEDEN ekran - bez bramy. Palenisko nie jest kolejna lokacja do zwiedzenia,
+     tylko miejscem gdzie sie siada: brama zapowiadalaby kolekcje, ktorej tu nie ma.
+     Rytm koncowki: 6,6,2,2,1 - wyciszanie. Przejscie czytelne przez TEMPO i cieplo kadru. */
+  var hearthEl=document.getElementById('hearth'),
+      hRoom=document.getElementById('hRoom'), hshade=document.getElementById('hshade'),
+      hcopy=document.getElementById('hcopy');
+  var hearthP=0, hearthTarget=0, hearthEntered=false;
+
+  function beginHearth(){
+    if(state!=='hearth-arm')return;
+    state='hearth'; hearthEntered=false;
+    hearthEl.classList.add('active');
+    progressEl.classList.remove('show');
+  }
+
+  function renderHearth(p){
+    if(p>0.05) hearthEntered=true;
+    var libFade=cl(1-p/0.12,0,1);
+    fadeSection(libraryEl,libFade);
+    if(hearthEntered && p<=0.01 && state==='hearth'){
+      state='library'; hearthEntered=false;
+      hearthTarget=0; hearthP=0;
+      libraryEl.classList.add('active');   // po skoku poprzednia sekcja moze byc nieaktywna -> szary ekran
+      libraryEl.style.opacity=''; libraryEl.style.pointerEvents=''; libraryEl.style.visibility='';
+      hearthEl.classList.remove('active');
+      progressEl.classList.remove('show');
+      ensureDots(2);
+      libTarget=1; libP=1; renderLibrary(1);
+      return;
+    }
+    // wejscie w kadr powolne - to koniec drogi, ma wyciszac
+    hRoom.style.transform='scale('+(1.07-cl(p/0.55,0,1)*0.07)+')';
+    // copy i formularz z opoznieniem wzgledem tla (brak bramy -> tempo robi przejscie)
+    var on = p>0.30;
+    hshade.style.opacity = on ? '1' : '0';
+    hcopy.classList.toggle('show', on);
+    progressEl.classList.toggle('show', p>0.12);
+    if(p>0.12){
+      progLabel.textContent='The Hearth'; progSub.textContent='Come in';
+      ensureDots(1); setDot(0);
+    }
+  }
+  function addHearth(dl){ hearthTarget=cl(hearthTarget+dl,0,1); }
+
+  /* ---- formularz + ekran-nagroda ---- */
+  (function(){
+    var form=document.getElementById('hform');
+    if(!form) return;
+    var btn=document.getElementById('hsend'), fail=document.getElementById('hfail'),
+        dawn=document.getElementById('dawn');
+    var loadedAt=Date.now();
+    function fld(id){ return document.getElementById(id); }
+    function mark(el,bad){ el.classList.toggle('err',bad); return !bad; }
+
+    form.addEventListener('submit',function(e){
+      e.preventDefault();
+      fail.textContent='';
+      var name=fld('hName').value.trim(), mail=fld('hMail').value.trim(),
+          msg=fld('hMsg').value.trim(), pot=fld('hCompany').value;
+      var ok=true;
+      ok = mark(fld('fldName'), name.length<2) && ok;
+      ok = mark(fld('fldMail'), !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)) && ok;
+      ok = mark(fld('fldMsg'), msg.length<10) && ok;
+      if(!ok) return;
+
+      // honeypot + czas: udajemy sukces, nic nie wysylamy
+      if(pot || (Date.now()-loadedAt)<3000){ reveal(); return; }
+
+      btn.disabled=true; btn.textContent='Sending\u2026';
+      fetch('/api/contact',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({name:name,email:mail,message:msg,company:pot,elapsed:Date.now()-loadedAt})
+      }).then(function(r){
+        if(!r.ok) throw new Error('bad status');
+        return r.json();
+      }).then(function(){ reveal(); })
+      .catch(function(){
+        btn.disabled=false; btn.textContent='Send it down the mountain \u2192';
+        fail.textContent='The message didn\u2019t get through. Try again, or write to me on LinkedIn.';
+      });
+    });
+
+    function reveal(){
+      dawn.classList.add('show');
+      dawn.setAttribute('aria-hidden','false');
+      document.activeElement && document.activeElement.blur();
+    }
+  })();
+
+  /* ================= NAWIGACJA: MENU + SLUZA =================
+     Menu widoczne domyslnie od wyjscia z Hero (decyzja KP 2026-07-21,
+     nadpisuje wczesniejsza zasade "dopiero po ukonczeniu trasy" - master 4.4). */
+  var ROUTE=[
+    {key:'about',    el:aboutEl,    num:'Chamber I',    name:'The Great Hall',    sub:'Who works the stone below.'},
+    {key:'career',   el:careerEl,   num:'Chamber II',   name:'Three Roads',       sub:'The lands walked before this one.'},
+    {key:'drafting', el:draftingEl, num:'Chamber III',  name:'The Drafting Room', sub:'Where the mechanisms are drawn.'},
+    {key:'forge',    el:forgeEl,    num:'Chamber IV',   name:'The Forge',         sub:'Work shipped, and the marks it left.'},
+    {key:'atelier',  el:atelierEl,  num:'Chamber V',    name:'The Atelier',       sub:'Craft made after hours.'},
+    {key:'planning', el:planningEl, num:'Chamber VI',   name:'The Planning Hall', sub:'Things still in the making.'},
+    {key:'library',  el:libraryEl,  num:'Chamber VII',  name:'The Library',       sub:'What was written down and taught.'},
+    {key:'hearth',   el:hearthEl,   num:'Chamber VIII', name:'The Hearth',        sub:'A fire, a chair, and a way to reach me.'}
+  ];
+  // Brama (Hero) nie jest komnata - to wejscie. Osobna pozycja na poczatku listy.
+  var HERO_ITEM={key:'hero',num:'The Gate',name:'The Gate',sub:'Back to the beginning of the road.'};
+
+  var navBtn=document.getElementById('navBtn'), navPanel=document.getElementById('navPanel'),
+      navList=document.getElementById('navList'), airlock=document.getElementById('airlock'),
+      alNum=document.getElementById('alNum'), alName=document.getElementById('alName'),
+      alSub=document.getElementById('alSub');
+
+  var jumping=false, jumpCount=0;
+  // widoczne poza Hero/intro i poza ekranem-nagroda
+  function chromeVisible(){
+    if(state==='intro'||state==='hero') return false;
+    var d=document.getElementById('dawn');
+    if(d && d.classList.contains('show')) return false;
+    return !jumping;
+  }
+  function refreshChrome(){
+    var v=chromeVisible();
+    navBtn.classList.toggle('show', v);
+    if(!v) closeNav();
+  }
+
+  function buildNav(){
+    navList.innerHTML='';
+    [HERO_ITEM].concat(ROUTE).forEach(function(it){
+      var b=document.createElement('button');
+      b.className='navItem'; b.type='button'; b.dataset.key=it.key;
+      b.innerHTML='<span class="navNum">'+it.num.replace(/^Chamber /,'')+'</span><span class="navName">'+it.name+'</span>';
+      b.addEventListener('click',function(){ closeNav(); jumpTo(it.key); });
+      navList.appendChild(b);
+    });
+  }
+  function markHere(){
+    Array.prototype.forEach.call(navList.children,function(b){
+      b.classList.toggle('here', b.dataset.key===state);
+    });
+  }
+  function openNav(){ markHere(); navPanel.classList.add('open');
+    navPanel.setAttribute('aria-hidden','false'); navBtn.classList.add('open'); navBtn.setAttribute('aria-expanded','true'); }
+  function closeNav(){ navPanel.classList.remove('open'); navPanel.setAttribute('aria-hidden','true');
+    navBtn.classList.remove('open'); navBtn.setAttribute('aria-expanded','false'); }
+  navBtn.addEventListener('click',function(){ navPanel.classList.contains('open')?closeNav():openNav(); });
+  window.addEventListener('keydown',function(e){ if(e.key==='Escape') closeNav(); });
+  buildNav();
+
+  /* --- wygaszenie wszystkiego, zeby skok nie zostawil artefaktow --- */
+  function clearAllSections(){
+    ROUTE.forEach(function(r){
+      r.el.classList.remove('active');
+      r.el.style.opacity=''; r.el.style.pointerEvents=''; r.el.style.visibility='';
+    });
+    // HERO (z-index 100) NIE jest w ROUTE - trzeba go schowac osobno, inaczej po skoku
+    // przez About (renderAbout przy niskim p pokazuje hero) zostawal na wierzchu nad celem.
+    fadeSection(heroEl,0);
+    aboutP=aboutTarget=0; descended=false;
+    careerP=careerTarget=0; careerEntered=false;
+    draftP=draftTarget=0; draftEntered=false;
+    forgeP=forgeTarget=0; forgeEntered=false;
+    atelierP=atelierTarget=0; atelierEntered=false;
+    planP=planTarget=0; planEntered=false;
+    libP=libTarget=0; libEntered=false;
+    hearthP=hearthTarget=0; hearthEntered=false;
+    progressEl.classList.remove('show');
+  }
+
+  /* --- ustawienie sekcji docelowej od p=0 (jej wlasne wejscie) --- */
+  var BEGIN={about:beginDescent,career:beginCareer,drafting:beginDrafting,forge:beginForge,
+             atelier:beginAtelier,planning:beginPlanning,library:beginLibrary,hearth:beginHearth};
+  var RENDER={about:renderAbout,career:renderCareer,drafting:renderDrafting,forge:renderForge,
+              atelier:renderAtelier,planning:renderPlanning,library:renderLibrary,hearth:renderHearth};
+  // p, na ktorym skok z menu LADUJE sekcje.
+  //  - Bramy = 0.08 (NIE 0!): renderX(0.08) ustawia xEntered=true (prog 0.05), wiec scroll W TYL
+  //    dziala OD RAZU (powrot wymaga xEntered && p<=0.01); a 0.08 > 0.01 wiec nie odbija natychmiast.
+  //    Przy p=0 xEntered zostawal false i scroll w gore nie mial jak wywolac powrotu do poprzedniej.
+  //  - About = 0.6 (Wielka Sala; p=0 pokazalby Hero na wierzchu - patrz master 16.2).
+  //  - Palenisko = 1 (scena osiadla z formularzem; nie ma bramy - patrz master 16.1 B).
+  var LAND_P={about:0.6,career:0.08,drafting:0.08,forge:0.08,atelier:0.08,planning:0.08,library:0.08,hearth:1};
+  var SETP={about:function(p){aboutTarget=aboutP=p;},career:function(p){careerTarget=careerP=p;},
+            drafting:function(p){draftTarget=draftP=p;},forge:function(p){forgeTarget=forgeP=p;},
+            atelier:function(p){atelierTarget=atelierP=p;},planning:function(p){planTarget=planP=p;},
+            library:function(p){libTarget=libP=p;},hearth:function(p){hearthTarget=hearthP=p;}};
+
+  function landOn(key){
+    clearAllSections();
+    if(key==='hero'){
+      // landOnHero przywraca komplet: klatke, shade, copy, atmosfere, podpowiedz scrolla.
+      // heroEl trzeba jawnie odsloniac, bo clearAllSections wlasnie go schowal (fadeSection).
+      heroEl.style.opacity='1'; heroEl.style.pointerEvents='auto'; heroEl.style.visibility='';
+      frames[3].style.opacity=1; frames[3].style.transform='scale(1)';
+      landOnHero();
+      refreshChrome();
+      return;
+    }
+    // stan-armowanie, bo beginX() sprawdza state==='x-arm'.
+    // Wyjatek: beginDescent (About) wymaga state==='hero' - najstarsza funkcja, inna konwencja.
+    state = (key==='about') ? 'hero' : key+'-arm';
+    BEGIN[key]();
+    if(key==='about') ensureDots(2);   // About uzywa statycznych kropek d0/d1, nie ensureDots
+    var lp=LAND_P[key];
+    SETP[key](lp);      // ustaw p i target sekcji (patrz LAND_P wyzej - dlaczego nie 0)
+    RENDER[key](lp);
+    refreshChrome();
+  }
+
+  /* --- SLUZA: jedna ilustracja, copy wg celu.
+         Pierwszy skok pelny (~1.5s), kolejne skrocone (~0.75s, bez lede). --- */
+  function jumpTo(key){
+    if(jumping) return;
+    if(key===state){ return; }
+    jumping=true;
+    refreshChrome();
+
+    var item = key==='hero' ? HERO_ITEM : ROUTE.filter(function(r){return r.key===key;})[0];
+    if(!item){ jumping=false; refreshChrome(); return; }
+
+    var brief = jumpCount>0;
+    jumpCount++;
+    alNum.textContent=item.num;
+    alName.textContent=item.name;
+    alSub.textContent=item.sub;
+    airlock.classList.toggle('brief', brief);
+    airlock.setAttribute('aria-hidden','false');
+
+    var hold = brief ? 750 : 1500;
+    // 1) sluza wchodzi. Dodajemy '.on' SYNCHRONICZNIE (nie przez requestAnimationFrame):
+    //    rAF jest wstrzymywany gdy karta jest w tle, a setTimeout ponizej - nie. Gdyby '.on'
+    //    dodawal sie przez rAF, przy przelaczeniu karty w trakcie skoku cleanup (setTimeout)
+    //    zdejmowal '.on' ZANIM rAF go dodal -> po powrocie sluza zostawala na stale na ekranie.
+    //    Element ma opacity:0 w CSS od startu, wiec przejscie i tak sie odgrywa.
+    airlock.classList.add('on');
+    // 2) pod jej oslona podmieniamy scene
+    setTimeout(function(){ landOn(key); }, 430);
+    // 3) sluza gasnie, cel juz stoi pod spodem
+    setTimeout(function(){
+      airlock.classList.remove('on');
+      airlock.setAttribute('aria-hidden','true');
+      setTimeout(function(){ jumping=false; refreshChrome(); }, 430);
+    }, 430+hold);
+  }
+
+  /* ========== GESTY (hero -> about -> career -> drafting) ========== */
+  function feedDown(amt){
+    if(state==='hero'){ beginDescent(); addAbout(amt); return; }
+    if(state==='about'){
+      if(aboutAtEnd()){ state='career-arm'; beginCareer(); addCareer(amt); }
+      else addAbout(amt);
+      return;
+    }
+    if(state==='career'){
+      if(careerAtEnd()){ state='drafting-arm'; beginDrafting(); addDrafting(amt); }
+      else addCareer(amt);
+      return;
+    }
+    if(state==='drafting'){
+      if(draftingAtEnd()){ state='forge-arm'; beginForge(); addForge(amt); }
+      else addDrafting(amt);
+      return;
+    }
+    if(state==='forge'){
+      if(forgeAtEnd()){ state='atelier-arm'; beginAtelier(); addAtelier(amt); }
+      else addForge(amt);
+      return;
+    }
+    if(state==='atelier'){
+      if(atelierAtEnd()){ state='planning-arm'; beginPlanning(); addPlanning(amt); }
+      else addAtelier(amt);
+      return;
+    }
+    if(state==='planning'){
+      if(planningAtEnd()){ state='library-arm'; beginLibrary(); addLibrary(amt); }
+      else addPlanning(amt);
+      return;
+    }
+    if(state==='library'){
+      if(libraryAtEnd()){ state='hearth-arm'; beginHearth(); addHearth(amt); }
+      else addLibrary(amt);
+      return;
+    }
+    if(state==='hearth'){ addHearth(amt); return; }
+  }
+  function feedUp(amt){
+    if(state==='hearth'){ addHearth(-amt); return; }
+    if(state==='library'){ addLibrary(-amt); return; }
+    if(state==='planning'){ addPlanning(-amt); return; }
+    if(state==='atelier'){ addAtelier(-amt); return; }
+    if(state==='forge'){ addForge(-amt); return; }
+    if(state==='drafting'){ addDrafting(-amt); return; }
+    if(state==='career'){ addCareer(-amt); return; }
+    if(state==='about'){ addAbout(-amt); return; }
+  }
+  /* Gesty musza milczec gdy widz pisze w formularzu albo oglada ekran-nagrode.
+     Bez tego scroll w textarea przewijalby cala gore, a swit dalby sie "odscrollowac". */
+  function inputBusy(){
+    var a=document.activeElement;
+    if(a && (a.tagName==='INPUT'||a.tagName==='TEXTAREA')) return true;
+    var d=document.getElementById('dawn');
+    if(d && d.classList.contains('show')) return true;
+    // sluza w locie albo otwarte menu - gest nie moze ruszac scena pod spodem
+    if(jumping) return true;
+    if(navPanel && navPanel.classList.contains('open')) return true;
+    return false;
+  }
+  window.addEventListener('wheel',function(e){
+    if(state==='intro'||state==='career-arm'||state==='drafting-arm'||state==='forge-arm'||state==='atelier-arm'||state==='planning-arm'||state==='library-arm'||state==='hearth-arm')return;
+    if(inputBusy())return;
+    if(state==='hero'){ if(e.deltaY>0){ e.preventDefault(); feedDown(e.deltaY*0.00035);} return; }
+    e.preventDefault();
+    if(e.deltaY>0) feedDown(e.deltaY*0.00035); else feedUp(-e.deltaY*0.00035);
+  },{passive:false});
+  window.addEventListener('keydown',function(e){
+    if(state==='intro'||state==='career-arm'||state==='drafting-arm'||state==='forge-arm'||state==='atelier-arm'||state==='planning-arm'||state==='library-arm'||state==='hearth-arm')return;
+    if(inputBusy())return;
+    if(e.key==='ArrowDown'||e.key==='PageDown'||e.key===' '){ feedDown(0.07); e.preventDefault(); }
+    if(e.key==='ArrowUp'||e.key==='PageUp'){ feedUp(0.07); e.preventDefault(); }
+  });
+  var ty=null;
+  window.addEventListener('touchstart',function(e){ ty=e.touches[0].clientY; },{passive:true});
+  window.addEventListener('touchmove',function(e){
+    if(state==='intro'||state==='career-arm'||state==='drafting-arm'||state==='forge-arm'||state==='atelier-arm'||state==='planning-arm'||state==='library-arm'||state==='hearth-arm'||ty===null)return;
+    if(inputBusy())return;
+    var d=ty-e.touches[0].clientY; ty=e.touches[0].clientY;
+    if(state==='hero'){ if(d>0) feedDown(d*0.00065); return; }
+    if(d>0) feedDown(d*0.00065); else feedUp(-d*0.00065);
+  },{passive:true});
+
+  /* pozwol przewijac WEWNATRZ paneli (dlugi formularz na malym ekranie) bez ruszania gory */
+  ['hwrap','dwrap'].forEach(function(cls){
+    Array.prototype.forEach.call(document.getElementsByClassName(cls),function(el){
+      el.addEventListener('wheel',function(e){ e.stopPropagation(); },{passive:true});
+      el.addEventListener('touchmove',function(e){ e.stopPropagation(); },{passive:true});
+    });
+  });
+
+  (function tickCareer(){
+    careerP+=(careerTarget-careerP)*0.06;
+    // snap do celu gdy roznica minimalna - bez tego lerp asymptotycznie nie schodzi
+    // do progu powrotu (<=0.002) i powrot Career->About "utyka" tuz nad zerem.
+    if(Math.abs(careerTarget-careerP)<0.0015) careerP=careerTarget;
+    if(state==='career') renderCareer(careerP);
+    requestAnimationFrame(tickCareer);
+  })();
+
+  (function tickDrafting(){
+    draftP+=(draftTarget-draftP)*0.06;
+    // snap do celu gdy roznica minimalna (wzorzec Career) - inaczej powrot "utyka" nad zerem
+    if(Math.abs(draftTarget-draftP)<0.0015) draftP=draftTarget;
+    if(state==='drafting') renderDrafting(draftP);
+    requestAnimationFrame(tickDrafting);
+  })();
+
+  (function tickForge(){
+    forgeP+=(forgeTarget-forgeP)*0.06;
+    if(Math.abs(forgeTarget-forgeP)<0.0015) forgeP=forgeTarget;
+    if(state==='forge') renderForge(forgeP);
+    requestAnimationFrame(tickForge);
+  })();
+
+  (function tickAtelier(){
+    atelierP+=(atelierTarget-atelierP)*0.06;
+    // snap do celu (wzorzec Career) - inaczej powrot "utyka" nad zerem
+    if(Math.abs(atelierTarget-atelierP)<0.0015) atelierP=atelierTarget;
+    if(state==='atelier') renderAtelier(atelierP);
+    requestAnimationFrame(tickAtelier);
+  })();
+
+  (function tickPlanning(){
+    planP+=(planTarget-planP)*0.06;
+    if(Math.abs(planTarget-planP)<0.0015) planP=planTarget;
+    if(state==='planning') renderPlanning(planP);
+    if(Math.abs(libTarget-libP)>0.0001){ libP+=(libTarget-libP)*0.075; if(Math.abs(libTarget-libP)<0.0009) libP=libTarget; }
+    if(state==='library') renderLibrary(libP);
+    if(Math.abs(hearthTarget-hearthP)>0.0001){ hearthP+=(hearthTarget-hearthP)*0.07; if(Math.abs(hearthTarget-hearthP)<0.0009) hearthP=hearthTarget; }
+    if(state==='hearth') renderHearth(hearthP);
+    requestAnimationFrame(tickPlanning);
+  })();
+
+  /* ========== ATMOSFERA HERO ========== */
+  /* chrome (skrot + menu) reaguje na zmiane stanu; osobna lekka petla,
+     bo kazda sekcja ma wlasny ticker i nie ma jednego wspolnego miejsca */
+  (function tickChrome(){
+    if(state!==tickChrome._last){ tickChrome._last=state; refreshChrome(); }
+    requestAnimationFrame(tickChrome);
+  })();
+
+  var atmoHeroStarted=false;
+  function startAtmoHero(){
+    if(atmoHeroStarted||reduce)return; atmoHeroStarted=true;
+    var ctx=atmoHero.getContext('2d');
+    function size(){atmoHero.width=window.innerWidth;atmoHero.height=window.innerHeight;}
+    size(); addEventListener('resize',size);
+    var dust=[],sparks=[];
+    for(var i=0;i<36;i++)dust.push({x:Math.random(),y:Math.random(),r:Math.random()*1.5+.4,s:Math.random()*.0004+.0001,o:Math.random()*.32+.07});
+    function ns(){return{x:.4+Math.random()*.4,y:.85+Math.random()*.2,vx:(Math.random()-.5)*.0006,vy:-(Math.random()*.0015+.0006),life:0,max:Math.random()*180+120,r:Math.random()*1.2+.4};}
+    for(var j=0;j<20;j++)sparks.push(ns());
+    function loop(){ if(state==='about'){ ctx.clearRect(0,0,atmoHero.width,atmoHero.height); requestAnimationFrame(loop); return; }
+      ctx.clearRect(0,0,atmoHero.width,atmoHero.height);
+      for(var dd of dust){dd.y-=dd.s;if(dd.y<0){dd.y=1;dd.x=Math.random();}ctx.beginPath();ctx.fillStyle='rgba(221,210,191,'+dd.o+')';ctx.arc(dd.x*atmoHero.width,dd.y*atmoHero.height,dd.r,0,6.28);ctx.fill();}
+      for(var s of sparks){s.x+=s.vx;s.y+=s.vy;s.life++;var a=Math.max(0,1-s.life/s.max);ctx.beginPath();ctx.fillStyle='rgba(243,197,106,'+(a*.8)+')';ctx.arc(s.x*atmoHero.width,s.y*atmoHero.height,s.r,0,6.28);ctx.fill();if(s.life>=s.max)Object.assign(s,ns());}
+      requestAnimationFrame(loop);
+    }
+    loop();
+  }
+
+  /* ========== ATMOSFERA ABOUT (per ekran) ========== */
+  var ctxA=atmoAbout.getContext('2d');
+  function sizeA(){ atmoAbout.width=window.innerWidth; atmoAbout.height=window.innerHeight; }
+  sizeA(); addEventListener('resize',sizeA); window.addEventListener('load',sizeA);
+  if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(sizeA); }
+  setTimeout(sizeA,300);
+  var dustA=[];
+  for(var i2=0;i2<26;i2++)dustA.push({x:Math.random(),y:Math.random(),r:Math.random()*1.3+.4,s:Math.random()*.0004+.0001,o:Math.random()*.26+.05});
+  var hallEmit=[0.12,0.30], cloiEmit=[0.20,0.52,0.83];
+  function mkSpark(xs){var x=xs[(Math.random()*xs.length)|0]+(Math.random()-.5)*0.06;
+    return{x:x,y:.78+Math.random()*.22,vx:(Math.random()-.5)*.0004,vy:-(Math.random()*.0012+.0004),life:0,max:Math.random()*170+110,r:Math.random()*1.1+.4};}
+  var sparksA=[];
+  window.__atmoHall=0; window.__atmoCloi=0;
+  var lastScene=null;
+  var lowDust=[];
+  for(var q=0;q<60;q++)lowDust.push({x:Math.random(),y:Math.random(),r:Math.random()*1.5+.7,s:Math.random()*.0003+.0001,drift:(Math.random()-.5)*.00025,o:Math.random()*.45+.25});
+  function loopA(){ if(reduce)return;
+    ctxA.clearRect(0,0,atmoAbout.width,atmoAbout.height);
+    if(state!=='about'){ requestAnimationFrame(loopA); return; }
+    var hallA=window.__atmoHall, cloiA=window.__atmoCloi;
+    var activeScene = cloiA>=hallA ? 'cloi' : 'hall';
+    var strength = activeScene==='cloi' ? cloiA : hallA;
+    if(activeScene!==lastScene){ sparksA.length=0; lastScene=activeScene; }
+    if(strength<0.04){ requestAnimationFrame(loopA); return; }
+    if(activeScene==='hall'){
+      for(var d of dustA){d.y-=d.s;if(d.y<0){d.y=1;d.x=Math.random();}
+        ctxA.beginPath();ctxA.fillStyle='rgba(221,210,191,'+(d.o*strength)+')';ctxA.arc(d.x*atmoAbout.width,d.y*atmoAbout.height,d.r,0,6.28);ctxA.fill();}
+      var want=Math.round(strength*16);
+      while(sparksA.length<want){ sparksA.push(mkSpark(hallEmit)); }
+      for(var k=sparksA.length-1;k>=0;k--){var s=sparksA[k];s.x+=s.vx;s.y+=s.vy;s.life++;
+        var a=Math.max(0,1-s.life/s.max)*strength;
+        ctxA.beginPath();ctxA.fillStyle='rgba(243,197,106,'+(a*.62)+')';ctxA.arc(s.x*atmoAbout.width,s.y*atmoAbout.height,s.r,0,6.28);ctxA.fill();
+        if(s.life>=s.max){ sparksA.splice(k,1); }}
+    } else {
+      for(var ld of lowDust){ ld.y-=ld.s; ld.x+=ld.drift; if(ld.y<0){ ld.y=1.0; ld.x=Math.random(); }
+        ctxA.beginPath();ctxA.fillStyle='rgba(240,232,214,'+(ld.o*strength)+')';ctxA.arc(ld.x*atmoAbout.width,ld.y*atmoAbout.height,ld.r,0,6.28);ctxA.fill();}
+    }
+    requestAnimationFrame(loopA);
+  }
+  if(!reduce) loopA();
+
+  /* ========== ATMOSFERA CAREER (per kraina) ==========
+     Krainy to pejzaze golden hour: land1 dolina (lekka mgla), land2 wąwóz (mgla znad przepasci),
+     land3 osada kuznicza (iskry forge + dym). Delikatnie, nie przytlacza sceny. */
+  var ctxC=atmoCareer.getContext('2d');
+  function sizeC(){ atmoCareer.width=window.innerWidth; atmoCareer.height=window.innerHeight; }
+  sizeC(); addEventListener('resize',sizeC); window.addEventListener('load',sizeC);
+  if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(sizeC); }
+  setTimeout(sizeC,300);
+  window.__cAtmo1=0; window.__cAtmo2=0; window.__cAtmo3=0;
+  // haze (drobinki mgly) dla land1 / land2 (unosza sie wolno)
+  var hazeC=[];
+  for(var h=0;h<70;h++)hazeC.push({x:Math.random(),y:Math.random(),r:Math.random()*1.8+.6,s:Math.random()*.00025+.00006,drift:(Math.random()-.5)*.0003,o:Math.random()*.4+.18});
+  // iskry forge dla land3 (osada) - z prawej strony gdzie kuznie
+  function mkForge(){ return{x:.55+Math.random()*.42,y:.6+Math.random()*.35,vx:(Math.random()-.5)*.0004,vy:-(Math.random()*.0013+.0005),life:0,max:Math.random()*160+110,r:Math.random()*1.2+.4}; }
+  var forgeC=[], lastC=null;
+  function loopC(){ if(reduce)return;
+    ctxC.clearRect(0,0,atmoCareer.width,atmoCareer.height);
+    if(state!=='career'){ requestAnimationFrame(loopC); return; }
+    var a1=window.__cAtmo1, a2=window.__cAtmo2, a3=window.__cAtmo3;
+    // wybierz dominujaca kraine
+    var scene='1', st=a1;
+    if(a2>=st){ scene='2'; st=a2; }
+    if(a3>=st){ scene='3'; st=a3; }
+    if(scene!==lastC){ forgeC.length=0; lastC=scene; }
+    if(st<0.04){ requestAnimationFrame(loopC); return; }
+    if(scene==='3'){
+      // dym + iskry kuznicze (ciepla poswiata)
+      for(var hh of hazeC){ hh.y-=hh.s*0.6; hh.x+=hh.drift; if(hh.y<0){hh.y=1;hh.x=.4+Math.random()*.6;}
+        ctxC.beginPath();ctxC.fillStyle='rgba(210,200,185,'+(hh.o*st*0.5)+')';ctxC.arc(hh.x*atmoCareer.width,hh.y*atmoCareer.height,hh.r*1.5,0,6.28);ctxC.fill();}
+      var want=Math.round(st*18);
+      while(forgeC.length<want){ forgeC.push(mkForge()); }
+      for(var k=forgeC.length-1;k>=0;k--){var s=forgeC[k];s.x+=s.vx;s.y+=s.vy;s.life++;
+        var al=Math.max(0,1-s.life/s.max)*st;
+        ctxC.beginPath();ctxC.fillStyle='rgba(243,197,106,'+(al*.7)+')';ctxC.arc(s.x*atmoCareer.width,s.y*atmoCareer.height,s.r,0,6.28);ctxC.fill();
+        if(s.life>=s.max){ forgeC.splice(k,1); }}
+    } else {
+      // land1 / land2: delikatna mgla unoszaca sie (land2 nizej - znad przepasci)
+      var baseY = scene==='2' ? 0.55 : 0.0;
+      for(var hz of hazeC){ hz.y-=hz.s; hz.x+=hz.drift; if(hz.y<baseY){ hz.y=1; hz.x=Math.random(); }
+        ctxC.beginPath();ctxC.fillStyle='rgba(232,226,212,'+(hz.o*st*0.6)+')';ctxC.arc(hz.x*atmoCareer.width,hz.y*atmoCareer.height,hz.r,0,6.28);ctxC.fill();}
+    }
+    requestAnimationFrame(loopC);
+  }
+  if(!reduce) loopC();
+})();
+</script>
+</body>
+</html>
