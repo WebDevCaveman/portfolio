@@ -286,7 +286,7 @@
     text-transform:uppercase;color:var(--parchment);opacity:.42;margin-top:1.35rem;line-height:1.7}
   @media (max-width:900px){ .planning-copy{max-width:22rem} }
   @media (max-width:760px){
-    .pwrapR,.pwrapL{align-items:flex-end;justify-content:center;padding:4vh 7vw 9vh}
+    .pwrapR,.pwrapL{align-items:flex-end;justify-content:center;padding:4vh 7vw 14vh}
     .planning-copy{max-width:100%}
     .planning-copy h3{font-size:1.4rem}
     .planning-copy p{font-size:13.5px}
@@ -327,7 +327,7 @@
   .llinks{flex-direction:row;flex-wrap:wrap;gap:.6rem;margin-top:1.35rem}
   @media (max-width:900px){ .library-copy{max-width:22rem} }
   @media (max-width:760px){
-    .lwrapL,.lwrapR{align-items:flex-end;justify-content:center;padding:4vh 7vw 9vh}
+    .lwrapL,.lwrapR{align-items:flex-end;justify-content:center;padding:4vh 7vw 14vh}
     .library-copy{max-width:100%}
     .library-copy h3{font-size:1.4rem}
     .library-copy p{font-size:13.5px}
@@ -410,7 +410,7 @@
     .dawn-copy h2{font-size:1.4rem}
   }
   @media (max-width:760px){
-    .awrapR,.awrapL{align-items:flex-end;justify-content:center;padding:4vh 7vw 9vh}
+    .awrapR,.awrapL{align-items:flex-end;justify-content:center;padding:4vh 7vw 14vh}
     .atelier-copy{max-width:100%}
     .atelier-copy h3{font-size:1.4rem}
     .atelier-copy p{font-size:13.5px}
@@ -441,7 +441,34 @@
     .forge-copy.fwide{max-width:100%}
     .fwide .fhead3{text-align:left}
   }
-  @media (max-width:760px){ .forge-copy{max-width:100%} .forge-copy p{font-size:13.5px} }
+  @media (max-width:760px){ .forge-copy{max-width:100%;max-height:none;overflow:visible} .forge-copy p{font-size:13.5px} }
+
+  /* ===== MOBILNY SPLIT: dlugi panel dzielony na 2 ekrany w obrebie jednego pasma p,
+     ta sama ilustracja pod spodem. Desktop pokazuje wszystko naraz (regula tylko <=760). ===== */
+  @media (max-width:760px){
+    .msplit:not(.mB) .mgB{display:none}
+    .msplit.mB .mgA{display:none}
+    .msplit .mgSeam{display:none}
+    /* wariant 3-stanowy: pokazuje 1 z 3 grup mg0/mg1/mg2 wg klasy s0/s1/s2 (chowa tylko nieaktywne) */
+    .msplit3.s0 .mg1,.msplit3.s0 .mg2{display:none}
+    .msplit3.s1 .mg0,.msplit3.s1 .mg2{display:none}
+    .msplit3.s2 .mg0,.msplit3.s2 .mg1{display:none}
+    .fwide .fhead3{margin-bottom:1rem}
+    /* zmiekczenie swapu: wchodzaca grupa (wraca z display:none) wpisuje sie plynnie.
+       @keyframes odpalaja sie przy powrocie z display:none - transition by nie zadzialal. */
+    .msplit .mgA,.msplit .mgB,.msplit3 .mg0,.msplit3 .mg1,.msplit3 .mg2{animation:mgFade .5s ease both}
+  }
+  @keyframes mgFade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+  /* CZYTELNOSC MOBILE: desktopowe scrimy sa boczne (90/270deg, ciemne przy krawedzi gasnace w srodku),
+     bo tam siedzi tekst. Na telefonie te sekcje sa wysrodkowane pionowo a tekst rozlewa sie na 100%
+     szerokosci -> wychodzi na przezroczysty srodek gradientu. Podmiana na pionowy scrim (jak fshadeC). */
+  @media (max-width:760px){
+    .copyshade,#shadeHall,.cshadeL,.cshadeR,.dshadeL,.dshadeR{
+      background:linear-gradient(180deg,rgba(35,37,42,.88) 0%,rgba(35,37,42,.68) 30%,rgba(35,37,42,.68) 70%,rgba(35,37,42,.88) 100%)}
+    .fshadeL,.fshadeR{
+      background:linear-gradient(180deg,rgba(30,26,24,.9) 0%,rgba(30,26,24,.72) 30%,rgba(30,26,24,.72) 70%,rgba(30,26,24,.9) 100%)}
+  }
 
   /* progress indicator: stylizowana nazwa sekcji + kropki pod spodem */
   .progress{position:fixed;bottom:4vh;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;align-items:center;gap:7px;opacity:0;transition:opacity .6s ease;pointer-events:none}
@@ -538,30 +565,30 @@
     <div id="shadeHall"></div>
     <div id="shadeCloi"></div>
     <div class="wrapHall">
-      <div class="copyHall" id="copyHall">
+      <div class="copyHall msplit" id="copyHall">
         <div class="eyebrow">The Great Hall</div>
-        <h2>Every craft leaves a record of the hands that shaped it.</h2>
+        <h2 class="mgA">Every craft leaves a record of the hands that shaped it.</h2>
         <div class="body">
-          <p>I built my first website almost fifteen years ago, and curiosity has shaped every step since. What began with front-end development gradually led me toward no-code platforms, business automation and product-focused application development.</p>
-          <p>Today I combine Bubble, automation and modern AI-assisted workflows to turn complex ideas into practical digital products. I enjoy understanding how a process works, finding where it can be improved, and building a solution that people can use without friction.</p>
+          <p class="mgA">I built my first website almost fifteen years ago, and curiosity has shaped every step since. What began with front-end development gradually led me toward no-code platforms, business automation and product-focused application development.</p>
+          <p class="mgB">Today I combine Bubble, automation and modern AI-assisted workflows to turn complex ideas into practical digital products. I enjoy understanding how a process works, finding where it can be improved, and building a solution that people can use without friction.</p>
         </div>
-        <div class="maker-note">Learned at other forges before lighting my own.</div>
+        <div class="maker-note mgB">Learned at other forges before lighting my own.</div>
       </div>
     </div>
-    <div class="wrapCloi" id="wrapCloi">
+    <div class="wrapCloi msplit3 s0" id="wrapCloi">
       <div class="cloiHead">Every master was first an apprentice.</div>
       <div class="cols">
-        <div class="col">
+        <div class="col mg0">
           <div class="school">Kodilla</div><div class="field">Front-end development</div>
           <div class="ctitle">The Foundations</div>
           <div class="cdesc">Where it started - building the web by hand, learning how structure becomes something people can use. HTML, CSS, JavaScript and React - the craft of turning designs into working interfaces.</div>
         </div>
-        <div class="col">
+        <div class="col mg1">
           <div class="school">eduweb</div><div class="field">No-code platforms</div>
           <div class="ctitle">The Shift</div>
           <div class="cdesc">The turning point - discovering that complex products could be built without writing everything from scratch. Airtable, Webflow and automation tools opened a faster way to ship real solutions.</div>
         </div>
-        <div class="col">
+        <div class="col mg2">
           <div class="school">ProNoCoders</div><div class="field">Bubble &amp; backend</div>
           <div class="ctitle">The Depth</div>
           <div class="cdesc">Going deeper - full application logic, data and backend, where ideas become working systems. Building complete web apps with databases, workflows and integrations.</div>
@@ -673,12 +700,13 @@
 
     <!-- EKRAN 2 (wewnetrzne) - copy LEWA, 4 schematy -->
     <div class="dwrapL" id="dwrap2">
-      <div class="draft-copy" id="dcopy2">
+      <div class="draft-copy msplit" id="dcopy2">
         <div class="dhead">
           <div class="eyebrow">Schematics</div>
           <h3>Schematics that keep the house in order.</h3>
           <p class="dlede">Plans for the quiet work behind the walls - records, knowledge, and the day itself.</p>
         </div>
+        <div class="mgA">
         <div class="schem">
           <div class="srune"><svg viewBox="0 0 18 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M9 1 V21"/><path d="M3 5 H15"/><path d="M3 17 H15"/></svg></div>
           <div class="scat">Administration &amp; Back Office</div>
@@ -692,7 +720,9 @@
           <div class="sname">The Archivist's Schematic</div>
           <p>Building knowledge bases, saving notes, ordering documents, and finding the right answer with AI when it's needed.</p>
         </div>
-        <div class="sdiv"></div>
+        </div>
+        <div class="sdiv mgSeam"></div>
+        <div class="mgB">
         <div class="schem">
           <div class="srune"><svg viewBox="0 0 18 22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M9 1 V21"/><path d="M2 11 L9 6 L16 11 L9 16 Z"/></svg></div>
           <div class="scat">Reporting</div>
@@ -705,6 +735,7 @@
           <div class="scat">Personal Productivity</div>
           <div class="sname">The Keeper's Schematic</div>
           <p>Tasks, calendars, mail, reminders, and small AI assistants - the mechanisms one builds for oneself.</p>
+        </div>
         </div>
       </div>
     </div>
@@ -758,25 +789,25 @@
 
     <!-- III. ARCHICOM - bohater, naglowek u gory + dwie rowne kolumny -->
     <div class="fwrapWide" id="fwrap3">
-      <div class="forge-copy fwide" id="fcopy3a">
+      <div class="forge-copy fwide msplit" id="fcopy3a">
         <div class="fhead3">
           <div class="eyebrow">Chamber III &middot; ARCHICOM</div>
           <h3>Two workbenches, one vein of ore.</h3>
           <p class="fseam">Both benches draw from the same seam: Webcon, the system this developer already ran on. Sound underneath, unlovely on top, and priced per head - so every new user cost more. I built the face; Webcon kept the records.</p>
         </div>
         <div class="fcols">
-          <div class="fcol">
+          <div class="fcol mgA">
             <div class="fsub">Tenders</div>
             <p>A dashboard for subcontractors: open and closed tenders, submissions approved by the developer's own department, and each bid walked through its steps - entry, pricing, documents, outcome, contract.</p>
             <p>A knowledge base and a channel to ask took repeat questions down by sixty-five percent.</p>
           </div>
-          <div class="fcol">
+          <div class="fcol mgB">
             <div class="fsub">Sales</div>
             <p>A tablet portal for the seller standing on site. Clickable plans - buildings, floors, apartments - each one marked free, reserved, or sold. Live prices and statuses drawn from Webcon.</p>
             <p>Offers that report back when the client opens them, that can be reserved only from within, and that expire when they should.</p>
           </div>
         </div>
-        <p class="fkicker">That's the work nobody photographs: making a friendly thing sit on top of a rigid one, and keeping the two in step.</p>
+        <p class="fkicker mgB">That's the work nobody photographs: making a friendly thing sit on top of a rigid one, and keeping the two in step.</p>
       </div>
     </div>
 
@@ -1000,15 +1031,15 @@
 
     <!-- I. KURS BUBBLE - copy LEWA (pomiar: lewa p95=33, kontrast 13.9:1) -->
     <div class="lwrapL" id="lwrap1">
-      <div class="library-copy" id="lcopy1">
+      <div class="library-copy msplit" id="lcopy1">
         <div class="eyebrow">Shelf I &middot; Authored course</div>
         <div class="lstatus">Authored course</div>
-        <h3>What was learned once, written down twice.</h3>
-        <p>A two-part Bubble course, built from scratch - first the design and the editor, then the logic that turns a layout into an application. Database work, privacy rules, front and backend workflows, Stripe payments, auto-binding, in-app messaging, branded email, Google SSO, automation through Make.</p>
-        <p>Also taught live - 8 weeks per cohort.</p>
-        <p class="lcount">94 video lessons - 32h 55min of material.</p>
-        <p class="ldetail">Built on StayNest, a full Airbnb-style rental portal made specifically so it could be taken apart and rebuilt.</p>
-        <div class="alinks llinks">
+        <h3 class="mgA">What was learned once, written down twice.</h3>
+        <p class="mgA">A two-part Bubble course, built from scratch - first the design and the editor, then the logic that turns a layout into an application. Database work, privacy rules, front and backend workflows, Stripe payments, auto-binding, in-app messaging, branded email, Google SSO, automation through Make.</p>
+        <p class="mgB">Also taught live - 8 weeks per cohort.</p>
+        <p class="lcount mgB">94 video lessons - 32h 55min of material.</p>
+        <p class="ldetail mgB">Built on StayNest, a full Airbnb-style rental portal made specifically so it could be taken apart and rebuilt.</p>
+        <div class="alinks llinks mgB">
           <a class="alink" href="https://eduweb.pl/ui-ux-i-webdesign/inne/mvp-aplikacji-w-rekordowym-czasie-z-bubble" target="_blank" rel="noopener noreferrer">Part one - design &#8599;</a>
           <a class="alink" href="https://eduweb.pl/biznes-i-automatyzacje/inne/mvp-aplikacji-z-bubble-logika" target="_blank" rel="noopener noreferrer">Part two - logic &#8599;</a>
         </div>
@@ -1017,14 +1048,14 @@
 
     <!-- II. ZAUTOMATYZOWANI - copy PRAWA (pomiar: prawa p95=48, kontrast 11.5:1) -->
     <div class="lwrapR" id="lwrap2">
-      <div class="library-copy" id="lcopy2">
+      <div class="library-copy msplit" id="lcopy2">
         <div class="eyebrow">Shelf II &middot; Automation programme</div>
         <div class="lstatus">Contributing author</div>
-        <h3>A hundred machines, handed over.</h3>
-        <p>Ready-made automation scenarios - not theory to memorise, but working builds to copy and bend to your own case. Make, Zapier, Airtable, AI assistants wired into everyday work.</p>
-        <p>Not the lead author - the one who built the scenarios and stayed.</p>
-        <p class="lcount">~100 scenarios - 5 consecutive cohorts.</p>
-        <p class="ldetail">Community support and weekly consultations for every participant.</p>
+        <h3 class="mgA">A hundred machines, handed over.</h3>
+        <p class="mgA">Ready-made automation scenarios - not theory to memorise, but working builds to copy and bend to your own case. Make, Zapier, Airtable, AI assistants wired into everyday work.</p>
+        <p class="mgB">Not the lead author - the one who built the scenarios and stayed.</p>
+        <p class="lcount mgB">~100 scenarios - 5 consecutive cohorts.</p>
+        <p class="ldetail mgB">Community support and weekly consultations for every participant.</p>
       </div>
     </div>
   </div>
@@ -1244,9 +1275,16 @@
     var hp=cl((p-0.4)/0.15,0,1)*cl(1-(p-0.62)/0.1,0,1);
     shadeHall.style.opacity=String(hp);
     copyHall.classList.toggle('show', p>0.44 && p<0.64);
+    // Great Hall: na mobile dziel na 2 pol-ekrany w obrebie pasma (0.44..0.64), ta sama ilustracja (hall)
+    copyHall.classList.toggle('mB', p>=0.54);
     var cp=cl((p-0.72)/0.2,0,1);
     cloi.style.opacity=String(cp); shadeCloi.style.opacity=String(cp);
     wrapCloi.classList.toggle('show', p>0.82);
+    // 3 ukonczone szkolenia - na mobile 1 na pol-ekran w obrebie pasma kruzganka (0.82..1), ta sama ilustracja (cloi)
+    var cs = p<0.88 ? 0 : (p<0.94 ? 1 : 2);
+    wrapCloi.classList.toggle('s0', cs===0);
+    wrapCloi.classList.toggle('s1', cs===1);
+    wrapCloi.classList.toggle('s2', cs===2);
     window.__atmoHall=cl((p-0.5)/0.06,0,1)*cl(1-(p-0.58)/0.05,0,1);
     window.__atmoCloi=cl((p-0.78)/0.08,0,1);
     // INDYKATOR SEKCJI: ukryty na bramie (przejscie), widoczny na ekranach tresciowych About.
@@ -1433,6 +1471,8 @@
     var show2 = p>0.66;
     dcopy1.classList.toggle('show', show1);
     dcopy2.classList.toggle('show', show2);
+    // Ekran 2 ma 4 schematy - na mobile dziel na 2 pol-ekrany w obrebie pasma (0.66..1), ta sama ilustracja
+    dcopy2.classList.toggle('mB', p>=0.83);
     dshadeR.style.opacity = show1 ? '1' : '0';
     dshadeL.style.opacity = show2 ? '1' : '0';
 
@@ -1515,6 +1555,10 @@
       var vis = p>(s+0.02) && p<(s+F_SPAN-0.03);
       if(fCopy[i]) fCopy[i].classList.toggle('show', vis);
     }
+    // ARCHICOM (komnata 3, index 2): na mobile panel dzieli sie na 2 pol-ekrany
+    // w obrebie wlasnego pasma - druga polowa odslania kolumne Sales. Ta sama ilustracja.
+    var s2=F_START+2*F_SPAN;
+    fCopy[2].classList.toggle('mB', p >= s2 + F_SPAN/2);
 
     // shade podaza za BIEZACA komnata (nie za widocznoscia copy) - koniec luki, w ktorej
     // oba cienie spadaly do 0 i kadr pojasnial miedzy komnatami. (WIDE = caly kadr)
@@ -1721,7 +1765,11 @@
       lBg[i].style.opacity=String(on*fade);
       lBg[i].style.transform='scale('+(1.05-cl((p-(st-0.05))/0.4,0,1)*0.05)+')';
       var vis = p>(st+0.03) && p<(st+L_SPAN-0.03);
-      if(lCopy[i]) lCopy[i].classList.toggle('show', vis);
+      if(lCopy[i]){
+        lCopy[i].classList.toggle('show', vis);
+        // szkolenia maja duzo tresci - na mobile dziel kazda polke na 2 pol-ekrany w obrebie pasma
+        lCopy[i].classList.toggle('mB', p >= st + L_SPAN/2);
+      }
     }
     lshadeL.style.opacity = (sideNow==='L') ? '1' : '0';
     lshadeR.style.opacity = (sideNow==='R') ? '1' : '0';
