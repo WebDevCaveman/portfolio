@@ -406,9 +406,17 @@
   .dawn-copy p{font-size:14.5px;line-height:1.68;color:var(--parchment);opacity:.85;margin-bottom:1rem}
   .dclose{font-family:'Spectral',serif;font-style:italic;font-size:17px;color:var(--fire);opacity:.92;margin-top:1.8rem}
   @media (max-width:760px){
-    .hwrap{align-items:flex-start;padding:7vh 7vw 14vh}
-    .hearth-copy h2{font-size:1.5rem}
-    .hrow{flex-direction:column;gap:.85rem}
+    /* Palenisko: tresc scisnieta pionowo, by formularz + linki + colophon zmiescily sie
+       w BEZPIECZNYM obszarze iOS (~700px) mimo paskow przegladarki jedzacych viewport */
+    .hwrap{align-items:flex-start;padding:2vh 7vw calc(10vh + env(safe-area-inset-bottom,0px))}
+    .hearth-copy h2{font-size:1.4rem;margin-bottom:.6rem}
+    .hsub{margin-bottom:.6rem}
+    .hrow{flex-direction:column;gap:.55rem}
+    .hform{gap:.55rem}
+    .hfield textarea{min-height:3rem}
+    .hnote{margin-top:.5rem}
+    .hlinks{margin-top:.7rem}
+    .hcolophon{margin-top:.8rem}
     .hshade{background:linear-gradient(0deg,rgba(18,15,13,.94) 0%,rgba(18,15,13,.82) 50%,rgba(18,15,13,.45) 100%)}
     .dawn-copy h2{font-size:1.4rem}
   }
