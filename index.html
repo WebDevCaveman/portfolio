@@ -1825,11 +1825,8 @@
     var on = p>0.30;
     hshade.style.opacity = on ? '1' : '0';
     hcopy.classList.toggle('show', on);
-    progressEl.classList.toggle('show', p>0.12);
-    if(p>0.12){
-      progLabel.textContent='The Hearth'; progSub.textContent='Come in';
-      ensureDots(1); setDot(0);
-    }
+    // ponytail: brak wskaznika na Palenisku - koniec drogi, formularz + colophon nie moga z nim kolidowac (KP)
+    progressEl.classList.remove('show');
   }
   function addHearth(dl){ hearthTarget=cl(hearthTarget+dl,0,1); }
 
