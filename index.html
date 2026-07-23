@@ -382,6 +382,9 @@
     color:var(--parchment);opacity:.62;text-decoration:none;border-bottom:1px solid rgba(221,210,191,.24);
     padding-bottom:2px;transition:opacity .3s ease,color .3s ease,border-color .3s ease}
   .hlink:hover,.hlink:focus-visible{opacity:1;color:var(--amber);border-color:rgba(199,143,74,.6)}
+  .hcolophon{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.6px;text-transform:lowercase;
+    color:var(--fog);opacity:.5;margin-top:2.4rem;line-height:1.75}
+  .hcolophon .sep{opacity:.4;margin:0 .5rem}
 
   /* ekran-nagroda: swit. ULOTNY - bez localStorage, znika po odswiezeniu */
   #dawn{position:absolute;inset:0;z-index:70;background:#000;opacity:0;pointer-events:none;
@@ -403,7 +406,7 @@
   .dawn-copy p{font-size:14.5px;line-height:1.68;color:var(--parchment);opacity:.85;margin-bottom:1rem}
   .dclose{font-family:'Spectral',serif;font-style:italic;font-size:17px;color:var(--fire);opacity:.92;margin-top:1.8rem}
   @media (max-width:760px){
-    .hwrap{align-items:flex-start;padding:7vh 7vw 10vh}
+    .hwrap{align-items:flex-start;padding:7vh 7vw 14vh}
     .hearth-copy h2{font-size:1.5rem}
     .hrow{flex-direction:column;gap:.85rem}
     .hshade{background:linear-gradient(0deg,rgba(18,15,13,.94) 0%,rgba(18,15,13,.82) 50%,rgba(18,15,13,.45) 100%)}
@@ -1104,6 +1107,7 @@
           <a class="hlink" href="https://www.linkedin.com/in/krzysztof-piekarz-987642168/" target="_blank" rel="noopener noreferrer">LinkedIn &#8599;</a>
           <a class="hlink" href="https://github.com/WebDevCaveman" target="_blank" rel="noopener noreferrer">GitHub &#8599;</a>
         </div>
+        <p class="hcolophon">forged by hand by Krzysztof Piekarz<span class="sep">&middot;</span>no templates were harmed<span class="sep">&middot;</span>&copy; 2026 WebDevCaveman</p>
       </div>
     </div>
   </div>
