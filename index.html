@@ -248,10 +248,6 @@
     border:1px solid rgba(199,143,74,.5);padding:.7rem 1.15rem;border-radius:2px;
     transition:border-color .35s ease,background .35s ease,color .35s ease}
   .alink:hover,.alink:focus-visible{border-color:var(--amber);background:rgba(199,143,74,.1);color:var(--amber)}
-  .asrc{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.6px;text-transform:lowercase;
-    color:var(--parchment);opacity:.45;text-decoration:none;border-bottom:1px solid rgba(232,228,220,.22);
-    padding-bottom:1px;transition:opacity .35s ease,color .35s ease,border-color .35s ease}
-  .asrc:hover,.asrc:focus-visible{opacity:.9;color:var(--amber);border-color:rgba(199,143,74,.6)}
   @media (max-width:900px){ .atelier-copy{max-width:20rem} }
 
   /* ========== SALA PLANOW (Lokacja 7) ========== */
@@ -323,7 +319,7 @@
   .ldetail{font-size:13.5px;line-height:1.6;color:var(--parchment);opacity:.62;margin-top:1.1rem}
   .library-copy .atech{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.8px;
     text-transform:uppercase;color:var(--parchment);opacity:.42;margin-top:1.35rem;line-height:1.7}
-  /* dwie czesci kursu sa ROWNORZEDNE - obie jako .alink, w rzedzie (nie .asrc, ktory jest przypisem) */
+  /* dwie czesci kursu sa ROWNORZEDNE - obie jako .alink, w rzedzie */
   .llinks{flex-direction:row;flex-wrap:wrap;gap:.6rem;margin-top:1.35rem}
   @media (max-width:900px){ .library-copy{max-width:22rem} }
   @media (max-width:760px){
@@ -352,73 +348,21 @@
     color:var(--parchment);margin-bottom:1.1rem;text-shadow:0 2px 34px rgba(0,0,0,.9)}
   .hearth-copy .hsub{font-size:14.5px;line-height:1.65;color:var(--parchment);opacity:.85;margin:0 auto 2.1rem;max-width:30rem}
 
-  /* formularz */
-  .hform{display:flex;flex-direction:column;gap:.85rem;text-align:left;margin:0 auto;max-width:30rem}
-  .hrow{display:flex;gap:.85rem}
-  .hrow > *{flex:1}
-  .hfield label{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:2.2px;
-    text-transform:uppercase;color:var(--parchment);opacity:.5;margin-bottom:.4rem}
-  .hfield input,.hfield textarea{width:100%;font-family:'Archivo',sans-serif;font-size:14px;color:var(--parchment);
-    background:rgba(24,21,19,.62);border:1px solid rgba(221,210,191,.22);border-radius:2px;padding:.7rem .85rem;
-    transition:border-color .3s ease,background .3s ease}
-  .hfield textarea{resize:vertical;min-height:5.5rem;line-height:1.55}
-  .hfield input:focus,.hfield textarea:focus{outline:none;border-color:var(--amber);background:rgba(24,21,19,.8)}
-  .hfield input::placeholder,.hfield textarea::placeholder{color:var(--parchment);opacity:.3}
-  .hfield.err input,.hfield.err textarea{border-color:#B4573C}
-  .herr{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.4px;color:#D08163;margin-top:.3rem;display:none}
-  .hfield.err .herr{display:block}
-  /* honeypot - niewidoczny dla ludzi, wypelniany przez boty */
-  .hpot{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none}
-  .hsend{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.2px;text-transform:uppercase;
-    color:var(--parchment);background:rgba(199,143,74,.14);border:1px solid rgba(199,143,74,.5);border-radius:2px;
-    padding:.85rem 1.4rem;margin-top:.5rem;cursor:pointer;transition:background .3s ease,border-color .3s ease,color .3s ease}
-  .hsend:hover:not(:disabled),.hsend:focus-visible{background:rgba(199,143,74,.26);border-color:var(--amber);color:var(--fire)}
-  .hsend:disabled{opacity:.5;cursor:default}
+  .hmsg{font-family:'Spectral',serif;font-style:italic;font-size:17px;color:var(--fire);opacity:.92;margin:0 auto;max-width:30rem}
   .hnote{font-size:12.5px;line-height:1.6;color:var(--parchment);opacity:.55;margin-top:1.2rem}
-  .hfail{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:1.2px;color:#D08163;
-    margin-top:.9rem;min-height:1.1rem}
-  .hlinks{display:flex;gap:1.4rem;justify-content:center;margin-top:1.6rem}
-  .hlink{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:2px;text-transform:uppercase;
-    color:var(--parchment);opacity:.62;text-decoration:none;border-bottom:1px solid rgba(221,210,191,.24);
-    padding-bottom:2px;transition:opacity .3s ease,color .3s ease,border-color .3s ease}
-  .hlink:hover,.hlink:focus-visible{opacity:1;color:var(--amber);border-color:rgba(199,143,74,.6)}
   .hcolophon{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.6px;text-transform:lowercase;
     color:var(--fog);opacity:.5;margin-top:2.4rem;line-height:1.75}
   .hcolophon .sep{opacity:.4;margin:0 .5rem}
 
-  /* ekran-nagroda: swit. ULOTNY - bez localStorage, znika po odswiezeniu */
-  #dawn{position:absolute;inset:0;z-index:70;background:#000;opacity:0;pointer-events:none;
-    transition:opacity 1.6s ease;overflow:hidden}
-  #dawn.show{opacity:1;pointer-events:auto}
-  #dawnBg{position:absolute;inset:0;background-image:url("assets/hearth-dawn.webp");
-    background-size:cover;background-position:center;transform:scale(1.06);
-    transition:transform 6s cubic-bezier(.2,.6,.2,1)}
-  #dawn.show #dawnBg{transform:scale(1)}
-  #dawnShade{position:absolute;inset:0;
-    background:radial-gradient(ellipse 66% 76% at 50% 52%,rgba(16,14,12,.82) 0%,rgba(16,14,12,.62) 48%,rgba(16,14,12,.2) 78%,rgba(16,14,12,0) 100%)}
-  .dwrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:6vh 6vw;overflow-y:auto}
-  .dawn-copy{max-width:33rem;text-align:center;opacity:0;transform:translateY(26px);
-    transition:opacity 1.4s ease .5s,transform 1.4s ease .5s}
-  #dawn.show .dawn-copy{opacity:1;transform:translateY(0)}
-  .dawn-copy .eyebrow{margin-bottom:1.1rem}
-  .dawn-copy h2{font-family:'Spectral',serif;font-weight:500;font-size:clamp(1.6rem,3vw,2.4rem);line-height:1.14;
-    color:var(--parchment);margin-bottom:1.3rem;text-shadow:0 2px 34px rgba(0,0,0,.9)}
-  .dawn-copy p{font-size:14.5px;line-height:1.68;color:var(--parchment);opacity:.85;margin-bottom:1rem}
-  .dclose{font-family:'Spectral',serif;font-style:italic;font-size:17px;color:var(--fire);opacity:.92;margin-top:1.8rem}
   @media (max-width:760px){
-    /* Palenisko: tresc scisnieta pionowo, by formularz + linki + colophon zmiescily sie
+    /* Palenisko: tresc scisnieta pionowo, by copy + colophon zmiescily sie
        w BEZPIECZNYM obszarze iOS (~700px) mimo paskow przegladarki jedzacych viewport */
     .hwrap{align-items:flex-start;padding:5vh 7vw calc(8vh + env(safe-area-inset-bottom,0px))}
     .hearth-copy h2{font-size:1.4rem;margin-bottom:.6rem}
     .hsub{margin-bottom:.6rem}
-    .hrow{flex-direction:column;gap:.55rem}
-    .hform{gap:.55rem}
-    .hfield textarea{min-height:3rem}
     .hnote{margin-top:.5rem}
-    .hlinks{margin-top:.7rem}
     .hcolophon{margin-top:.8rem}
     .hshade{background:linear-gradient(0deg,rgba(18,15,13,.94) 0%,rgba(18,15,13,.82) 50%,rgba(18,15,13,.45) 100%)}
-    .dawn-copy h2{font-size:1.4rem}
   }
   @media (max-width:760px){
     .awrapR,.awrapL{align-items:flex-end;justify-content:center;padding:4vh 7vw 14vh}
@@ -890,7 +834,6 @@
         <div class="atech">Nano Banana Pro &middot; Kling 3.0 &middot; GSAP ScrollTrigger</div>
         <div class="alinks">
           <a class="alink" href="https://homer-mu.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
-          <a class="asrc" href="https://github.com/WebDevCaveman/homer" target="_blank" rel="noopener noreferrer">source &#8599;</a>
         </div>
       </div>
     </div>
@@ -905,7 +848,6 @@
         <div class="atech">AURELIA framework &middot; Higgsfield stills &middot; motion design</div>
         <div class="alinks">
           <a class="alink" href="https://satori-spa-theta.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
-          <a class="asrc" href="https://github.com/WebDevCaveman/satori-spa" target="_blank" rel="noopener noreferrer">source &#8599;</a>
         </div>
       </div>
     </div>
@@ -920,7 +862,6 @@
         <div class="atech">Nano Banana Pro &middot; animated clip-path &middot; Canvas particles</div>
         <div class="alinks">
           <a class="alink" href="https://wonderyear.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
-          <a class="asrc" href="https://github.com/WebDevCaveman/wonderyear" target="_blank" rel="noopener noreferrer">source &#8599;</a>
         </div>
       </div>
     </div>
@@ -935,7 +876,6 @@
         <div class="atech">Nano Banana Pro &middot; layered parallax &middot; micro-loops</div>
         <div class="alinks">
           <a class="alink" href="https://hearth-and-fable.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
-          <a class="asrc" href="https://github.com/WebDevCaveman/hearth-and-fable" target="_blank" rel="noopener noreferrer">source &#8599;</a>
         </div>
       </div>
     </div>
@@ -950,7 +890,6 @@
         <div class="atech">51 photographs &middot; 12 hand-drawn crests &middot; GSAP Flip</div>
         <div class="alinks">
           <a class="alink" href="https://quad-ochre.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
-          <a class="asrc" href="https://github.com/WebDevCaveman/quad" target="_blank" rel="noopener noreferrer">source &#8599;</a>
         </div>
       </div>
     </div>
@@ -965,7 +904,6 @@
         <div class="atech">AURELIA v2.2 &middot; Kling 3.0 loops &middot; quiet luxury</div>
         <div class="alinks">
           <a class="alink" href="https://isolario.vercel.app/" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
-          <a class="asrc" href="https://github.com/WebDevCaveman/isolario" target="_blank" rel="noopener noreferrer">source &#8599;</a>
         </div>
       </div>
     </div>
@@ -1002,7 +940,6 @@
         <!-- LINKI: dodac gdy aplikacja bedzie zbudowana (13.3) - markup jak w Atelier:
         <div class="alinks">
           <a class="alink" href="" target="_blank" rel="noopener noreferrer">View the site &#8599;</a>
-          <a class="asrc" href="" target="_blank" rel="noopener noreferrer">source &#8599;</a>
         </div> -->
       </div>
     </div>
@@ -1084,53 +1021,10 @@
         <h2>Every forge keeps one fire that isn't for work.</h2>
         <p class="hsub">This is where the tools go down and the talking starts. If something here looked like it belongs in your world - say so.</p>
 
-        <form class="hform" id="hform" novalidate>
-          <div class="hrow">
-            <div class="hfield" id="fldName">
-              <label for="hName">Name</label>
-              <input type="text" id="hName" name="name" maxlength="80" autocomplete="name" placeholder="Who's writing">
-              <div class="herr">Tell me what to call you.</div>
-            </div>
-            <div class="hfield" id="fldMail">
-              <label for="hMail">Email</label>
-              <input type="email" id="hMail" name="email" maxlength="120" autocomplete="email" placeholder="Where the reply goes">
-              <div class="herr">That address doesn't look right.</div>
-            </div>
-          </div>
-          <div class="hfield" id="fldMsg">
-            <label for="hMsg">What you're building</label>
-            <textarea id="hMsg" name="message" maxlength="2000" placeholder="A few lines are enough"></textarea>
-            <div class="herr">A sentence or two, at least.</div>
-          </div>
-          <div class="hpot" aria-hidden="true">
-            <label for="hCompany">Company</label>
-            <input type="text" id="hCompany" name="company" tabindex="-1" autocomplete="off">
-          </div>
-          <button type="submit" class="hsend" id="hsend">Send it down the mountain &rarr;</button>
-          <div class="hfail" id="hfail" role="status" aria-live="polite"></div>
-        </form>
+        <p class="hmsg">Questions? Message me on the platform where you found me.</p>
 
         <p class="hnote">Fires are tended, not automated - expect a reply within two working days.</p>
-        <div class="hlinks">
-          <a class="hlink" href="https://www.linkedin.com/in/krzysztof-piekarz-987642168/" target="_blank" rel="noopener noreferrer">LinkedIn &#8599;</a>
-          <a class="hlink" href="https://github.com/WebDevCaveman" target="_blank" rel="noopener noreferrer">GitHub &#8599;</a>
-        </div>
         <p class="hcolophon">forged by hand by Krzysztof Piekarz<span class="sep">&middot;</span>no templates were harmed<span class="sep">&middot;</span>&copy; 2026 WebDevCaveman</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== EKRAN-NAGRODA: SWIT (ulotny, bez localStorage) ===== -->
-  <div id="dawn" aria-hidden="true">
-    <div id="dawnBg"></div>
-    <div id="dawnShade"></div>
-    <div class="dwrap">
-      <div class="dawn-copy">
-        <div class="eyebrow">The Mountain Gate, at dawn</div>
-        <h2>Message sent. Now the part that isn't in the portfolio.</h2>
-        <p>You came down through nine halls and out the other side - which is how this work actually goes. Something gets carried down, hammered on for a while, and carried back up into daylight.</p>
-        <p>Whatever you're building is somewhere in that cycle right now.</p>
-        <p class="dclose">The gate stays open.</p>
       </div>
     </div>
   </div>
@@ -1829,59 +1723,14 @@
     }
     // wejscie w kadr powolne - to koniec drogi, ma wyciszac
     hRoom.style.transform='scale('+(1.07-cl(p/0.55,0,1)*0.07)+')';
-    // copy i formularz z opoznieniem wzgledem tla (brak bramy -> tempo robi przejscie)
+    // copy z opoznieniem wzgledem tla (brak bramy -> tempo robi przejscie)
     var on = p>0.30;
     hshade.style.opacity = on ? '1' : '0';
     hcopy.classList.toggle('show', on);
-    // ponytail: brak wskaznika na Palenisku - koniec drogi, formularz + colophon nie moga z nim kolidowac (KP)
+    // ponytail: brak wskaznika na Palenisku - koniec drogi, copy + colophon nie moga z nim kolidowac (KP)
     progressEl.classList.remove('show');
   }
   function addHearth(dl){ hearthTarget=cl(hearthTarget+dl,0,1); }
-
-  /* ---- formularz + ekran-nagroda ---- */
-  (function(){
-    var form=document.getElementById('hform');
-    if(!form) return;
-    var btn=document.getElementById('hsend'), fail=document.getElementById('hfail'),
-        dawn=document.getElementById('dawn');
-    var loadedAt=Date.now();
-    function fld(id){ return document.getElementById(id); }
-    function mark(el,bad){ el.classList.toggle('err',bad); return !bad; }
-
-    form.addEventListener('submit',function(e){
-      e.preventDefault();
-      fail.textContent='';
-      var name=fld('hName').value.trim(), mail=fld('hMail').value.trim(),
-          msg=fld('hMsg').value.trim(), pot=fld('hCompany').value;
-      var ok=true;
-      ok = mark(fld('fldName'), name.length<2) && ok;
-      ok = mark(fld('fldMail'), !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)) && ok;
-      ok = mark(fld('fldMsg'), msg.length<10) && ok;
-      if(!ok) return;
-
-      // honeypot + czas: udajemy sukces, nic nie wysylamy
-      if(pot || (Date.now()-loadedAt)<3000){ reveal(); return; }
-
-      btn.disabled=true; btn.textContent='Sending\u2026';
-      fetch('/api/contact',{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({name:name,email:mail,message:msg,company:pot,elapsed:Date.now()-loadedAt})
-      }).then(function(r){
-        if(!r.ok) throw new Error('bad status');
-        return r.json();
-      }).then(function(){ reveal(); })
-      .catch(function(){
-        btn.disabled=false; btn.textContent='Send it down the mountain \u2192';
-        fail.innerHTML='The message didn\u2019t get through. Try again, or write to me on <a href="https://www.linkedin.com/in/krzysztof-piekarz-987642168/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">LinkedIn</a>.';
-      });
-    });
-
-    function reveal(){
-      dawn.classList.add('show');
-      dawn.setAttribute('aria-hidden','false');
-      document.activeElement && document.activeElement.blur();
-    }
-  })();
 
   /* ================= NAWIGACJA: MENU + SLUZA =================
      Menu widoczne domyslnie od wyjscia z Hero (decyzja KP 2026-07-21,
@@ -1905,11 +1754,9 @@
       alSub=document.getElementById('alSub');
 
   var jumping=false, jumpCount=0;
-  // widoczne poza Hero/intro i poza ekranem-nagroda
+  // widoczne poza Hero/intro
   function chromeVisible(){
     if(state==='intro'||state==='hero') return false;
-    var d=document.getElementById('dawn');
-    if(d && d.classList.contains('show')) return false;
     return !jumping;
   }
   function refreshChrome(){
@@ -1971,7 +1818,7 @@
   //    dziala OD RAZU (powrot wymaga xEntered && p<=0.01); a 0.08 > 0.01 wiec nie odbija natychmiast.
   //    Przy p=0 xEntered zostawal false i scroll w gore nie mial jak wywolac powrotu do poprzedniej.
   //  - About = 0.6 (Wielka Sala; p=0 pokazalby Hero na wierzchu - patrz master 16.2).
-  //  - Palenisko = 1 (scena osiadla z formularzem; nie ma bramy - patrz master 16.1 B).
+  //  - Palenisko = 1 (scena osiadla z copy; nie ma bramy - patrz master 16.1 B).
   var LAND_P={about:0.6,career:0.08,drafting:0.08,forge:0.08,atelier:0.08,planning:0.08,library:0.08,hearth:1};
   var SETP={about:function(p){aboutTarget=aboutP=p;},career:function(p){careerTarget=careerP=p;},
             drafting:function(p){draftTarget=draftP=p;},forge:function(p){forgeTarget=forgeP=p;},
@@ -2086,13 +1933,8 @@
     if(state==='career'){ addCareer(-amt); return; }
     if(state==='about'){ addAbout(-amt); return; }
   }
-  /* Gesty musza milczec gdy widz pisze w formularzu albo oglada ekran-nagrode.
-     Bez tego scroll w textarea przewijalby cala gore, a swit dalby sie "odscrollowac". */
+  /* Gesty musza milczec, gdy sluza leci albo menu jest otwarte. */
   function inputBusy(){
-    var a=document.activeElement;
-    if(a && (a.tagName==='INPUT'||a.tagName==='TEXTAREA')) return true;
-    var d=document.getElementById('dawn');
-    if(d && d.classList.contains('show')) return true;
     // sluza w locie albo otwarte menu - gest nie moze ruszac scena pod spodem
     if(jumping) return true;
     if(navPanel && navPanel.classList.contains('open')) return true;
@@ -2121,8 +1963,8 @@
     if(d>0) feedDown(d*0.00065); else feedUp(-d*0.00065);
   },{passive:true});
 
-  /* pozwol przewijac WEWNATRZ paneli (dlugi formularz na malym ekranie) bez ruszania gory */
-  ['hwrap','dwrap'].forEach(function(cls){
+  /* pozwol przewijac WEWNATRZ paneli (dluga tresc na malym ekranie) bez ruszania gory */
+  ['hwrap'].forEach(function(cls){
     Array.prototype.forEach.call(document.getElementsByClassName(cls),function(el){
       el.addEventListener('wheel',function(e){ e.stopPropagation(); },{passive:true});
       el.addEventListener('touchmove',function(e){ e.stopPropagation(); },{passive:true});
